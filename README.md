@@ -18,7 +18,7 @@ Fast Friendly Dependency Injection
 
 ## QuickStart
 
-If you are new to DI, see [Why Di](#why-di?) below. The easiest way to get started is to use ZenIoc's singleton implementation. This will give access to the container throughout your app by calling `IocContainer`. 
+If you are new to DI, see [Why Di](#why-di) below. The easiest way to get started is to use ZenIoc's singleton implementation. This will give access to the container throughout your app by calling `IocContainer`. 
 
 ```c#
 using ZenIoc;
