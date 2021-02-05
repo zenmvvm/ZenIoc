@@ -23,8 +23,8 @@ env:
   NUGET_FEED: https://api.nuget.org/v3/index.json
   NUGET_KEY: ${{ secrets.NUGET_KEY }}
   # MyGet Feed settings
-  MYGET_FEED: https://www.myget.org/F/zeebz-open-source/api/v3/index.json
-  MYGET_KEY: ${{ secrets.MYGET_KEY}}
+#   MYGET_FEED: https://www.myget.org/F/zeebz-open-source/api/v3/index.json
+#   MYGET_KEY: ${{ secrets.MYGET_KEY}}
   
   # ***** EFFICIENCY SETTINGS *****
   # Stop wasting time caching packages
@@ -77,9 +77,9 @@ jobs:
         with:
           name: nupkg
           path: ./src/${{ env.PROJECT_NAME }}/bin/Release/*.nupkg
-      - name: If not develop or release, upload Bleeding Edge Package to MyGet
-        if: matrix.os == 'ubuntu-latest' && github.ref != 'refs/heads/develop' && github.event_name != 'release'
-        run: dotnet nuget push ./src/${{ env.PROJECT_NAME }}/bin/Release/*.nupkg --source $MYGET_FEED --skip-duplicate --api-key $MYGET_KEY
+#       - name: If not develop or release, upload Bleeding Edge Package to MyGet
+#         if: matrix.os == 'ubuntu-latest' && github.ref != 'refs/heads/develop' && github.event_name != 'release'
+#         run: dotnet nuget push ./src/${{ env.PROJECT_NAME }}/bin/Release/*.nupkg --source $MYGET_FEED --skip-duplicate --api-key $MYGET_KEY
 
   dependabotautomerge:
     # from https://localheinz.com/blog/2020/06/15/merging-pull-requests-with-github-actions/
