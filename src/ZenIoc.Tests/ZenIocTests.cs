@@ -1451,6 +1451,8 @@ namespace ZenIocTests
         [Fact]
         public void StaticResolveType_InstanceRegistered_ReturnsInstance()
         {
+            DiContainer.ResetContainer();
+
             var instance = new MyService();
             DiContainer.RegisterInstance(instance);
             var resolved = DiContainer.Resolve(typeof(MyService));
