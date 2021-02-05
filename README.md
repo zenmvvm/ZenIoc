@@ -5,32 +5,32 @@ Fast Friendly Dependency Injection
 
 * **Fast**. ZenIoc was designed to be used in mobile apps. As such, quick resolving of dependencies is important.
 * **Feature-Rich**. ZenIoc offers advanced features, without compromising on performance. ZenIoc supports:
-  * [Constructor selection](https://github.com/z33bs/ZenIoc/wiki/Registration#constructor-selection): If multiple constructors, can control which one is used to build the object.
-  * [Property Injection](https://github.com/z33bs/ZenIoc/wiki/Registration#linq-expressions): Objects which require property injection are resolved
-  * [Generics](https://github.com/z33bs/ZenIoc/wiki/Registration#open-generic-types): Objects with a generic dependency are resolved
-  * [IEnumerables](https://github.com/z33bs/ZenIoc/wiki/Registration#ienumerable): Several objects that implement the same interface are resolved into an Enumerable of that interface
-  * Conditional / [Named dependencies](https://github.com/z33bs/ZenIoc/wiki/Registration#named-registrations): Objects with a conditional dependency are resolved
-  * [Child Containers](https://github.com/z33bs/ZenIoc/wiki#child-containers): Objects can be scoped to a child container. Nesting of child containers is supported
+  * [Constructor selection](https://github.com/zenmvvm/ZenIoc/wiki/Registration#constructor-selection): If multiple constructors, can control which one is used to build the object.
+  * [Property Injection](https://github.com/zenmvvm/ZenIoc/wiki/Registration#linq-expressions): Objects which require property injection are resolved
+  * [Generics](https://github.com/zenmvvm/ZenIoc/wiki/Registration#open-generic-types): Objects with a generic dependency are resolved
+  * [IEnumerables](https://github.com/zenmvvm/ZenIoc/wiki/Registration#ienumerable): Several objects that implement the same interface are resolved into an Enumerable of that interface
+  * Conditional / [Named dependencies](https://github.com/zenmvvm/ZenIoc/wiki/Registration#named-registrations): Objects with a conditional dependency are resolved
+  * [Child Containers](https://github.com/zenmvvm/ZenIoc/wiki#child-containers): Objects can be scoped to a child container. Nesting of child containers is supported
 * **Friendly**. ZenIoc offers a simple API and convenience:
-  * [Smart-Resolve](https://github.com/z33bs/ZenIoc/wiki/Resolution#smart-resolve) will attempt to resolve an unregistered dependency
+  * [Smart-Resolve](https://github.com/zenmvvm/ZenIoc/wiki/Resolution#smart-resolve) will attempt to resolve an unregistered dependency
   * Singleton implementation for simple applications
   * Attribute decorators which simplify constructor selection and conditional resolution
 
 ## QuickStart
 
-If you are new to DI, see [Why Di](#why-di?) below. The easiest way to get started is to use ZenIoc's singleton implementation. This will give access to the container throughout your app by calling `DiContainer`. 
+If you are new to DI, see [Why Di](#why-di?) below. The easiest way to get started is to use ZenIoc's singleton implementation. This will give access to the container throughout your app by calling `IocContainer`. 
 
 ```c#
 using ZenIoc;
 
 //Register
-DiContainer.Register<IBrewEquipment,FrenchPress>();
+IocContainer.Register<IBrewEquipment,FrenchPress>();
 
 //Resolve
-var frenchPress = DiContainer.Resolve<IBrewEquipment>();
+var frenchPress = IocContainer.Resolve<IBrewEquipment>();
 ```
 
-For more details, [browse the wiki](https://github.com/z33bs/ZenIoc/wiki).
+For more details, [browse the wiki](https://github.com/zenmvvm/ZenIoc/wiki).
 
 ### Example
 
@@ -70,15 +70,15 @@ public class Program
 {
     static void Main(string[] args)
     {
-        DiContainer.Register<FilteredWater>().SingleInstance(); //Singleton
-        DiContainer.Register<IBrewEquipment,FrenchPress>();
-        DiContainer.Register<CoffeeRobot>();
+        IocContainer.Register<FilteredWater>().SingleInstance(); //Singleton
+        IocContainer.Register<IBrewEquipment,FrenchPress>();
+        IocContainer.Register<CoffeeRobot>();
 
-        var robot1 = DiContainer.Resolve<CoffeeRobot>();
-        var robot2 = DiContainer.Resolve<CoffeeRobot>();
-        var robot3 = DiContainer.Resolve<CoffeeRobot>();
-        var robot4 = DiContainer.Resolve<CoffeeRobot>();
-        var robot5 = DiContainer.Resolve<CoffeeRobot>();
+        var robot1 = IocContainer.Resolve<CoffeeRobot>();
+        var robot2 = IocContainer.Resolve<CoffeeRobot>();
+        var robot3 = IocContainer.Resolve<CoffeeRobot>();
+        var robot4 = IocContainer.Resolve<CoffeeRobot>();
+        var robot5 = IocContainer.Resolve<CoffeeRobot>();
     }
 }
 
@@ -90,7 +90,7 @@ public class Program
 //Ready to brew using FrenchPress5 and FilteredWater1
 ```
 
-ZenIoc has a convenient [Smart Resolve](https://github.com/z33bs/ZenIoc/wiki/Resolution#smart-resolve) feature. This lets the user resolve instances that haven't been registered in the container. The above code can be reduced to:
+ZenIoc has a convenient [Smart Resolve](https://github.com/zenmvvm/ZenIoc/wiki/Resolution#smart-resolve) feature. This lets the user resolve instances that haven't been registered in the container. The above code can be reduced to:
 
 ```c#
 //SMART-RESOLVE
@@ -99,11 +99,11 @@ public class Program
   static void Main(string[] args)
   {
     //No Registration needed
-    var robot1 = DiContainer.Resolve<CoffeeRobot>();
-    var robot2 = DiContainer.Resolve<CoffeeRobot>();
-    var robot3 = DiContainer.Resolve<CoffeeRobot>();
-    var robot4 = DiContainer.Resolve<CoffeeRobot>();
-    var robot5 = DiContainer.Resolve<CoffeeRobot>();
+    var robot1 = IocContainer.Resolve<CoffeeRobot>();
+    var robot2 = IocContainer.Resolve<CoffeeRobot>();
+    var robot3 = IocContainer.Resolve<CoffeeRobot>();
+    var robot4 = IocContainer.Resolve<CoffeeRobot>();
+    var robot5 = IocContainer.Resolve<CoffeeRobot>();
   }
 }
 
@@ -119,7 +119,7 @@ public class Program
 
 ## Why DI?
 
-> Skip to the [Wiki page](https://github.com/z33bs/ZenIoc/wiki) for documentation if you're already familiar with Di / Ioc.
+> Skip to the [Wiki page](https://github.com/zenmvvm/ZenIoc/wiki) for documentation if you're already familiar with Di / Ioc.
 
 Depenedency Injection addresses the creation of objects and their dependencies. This technique results in **loose coupling** between objects and their dependencies. Coupling between objects refers to the degree of knowledge that one object has of another one. So loose coupling means that objects are as independent of each other as possible. Using this technique results in **programs that are easily and safely modified**. A bonus side-effect is that your **code is more readable** because each object's dependencies are explicitly defined. 
 
@@ -262,18 +262,18 @@ public class Program
 {
     static void Main(string[] args)
     {
-        DiContainer.Register<Water, FilteredWater>().SingleInstance();
+        IocContainer.Register<Water, FilteredWater>().SingleInstance();
 
         //ZenIoc will automatically resolve the FilterPaper for the Chemex
-        DiContainer.Register<IBrewEquipment, Chemex>();
-        DiContainer.Register<Grinder>();
-        DiContainer.Register<CoffeeRobot>();
+        IocContainer.Register<IBrewEquipment, Chemex>();
+        IocContainer.Register<Grinder>();
+        IocContainer.Register<CoffeeRobot>();
 
-        var robot1 = DiContainer.Resolve<CoffeeRobot>();
-        var robot2 = DiContainer.Resolve<CoffeeRobot>();
-        var robot3 = DiContainer.Resolve<CoffeeRobot>();
-        var robot4 = DiContainer.Resolve<CoffeeRobot>();
-        var robot5 = DiContainer.Resolve<CoffeeRobot>();
+        var robot1 = IocContainer.Resolve<CoffeeRobot>();
+        var robot2 = IocContainer.Resolve<CoffeeRobot>();
+        var robot3 = IocContainer.Resolve<CoffeeRobot>();
+        var robot4 = IocContainer.Resolve<CoffeeRobot>();
+        var robot5 = IocContainer.Resolve<CoffeeRobot>();
 
         robot1.BrewCoffee("Yirgacheffe Arabica");
     }
@@ -293,27 +293,27 @@ public class Program
 {
     static void Main(string[] args)
     {
-        DiContainer.Register<Water, FilteredWater>().SingleInstance();
+        IocContainer.Register<Water, FilteredWater>().SingleInstance();
 
-        DiContainer.RegisterExplicit<CoffeeRobot,CoffeeRobot>(
+        IocContainer.RegisterExplicit<CoffeeRobot,CoffeeRobot>(
           c => new CoffeeRobot(
                     new Chemex(new FilterPaper()),
-                    DiContainer.Resolve<Water>(),
+                    IocContainer.Resolve<Water>(),
                     new Grinder()),
           "pour_over");
 
-        DiContainer.RegisterExplicit<CoffeeRobot,CoffeeRobot>(
+        IocContainer.RegisterExplicit<CoffeeRobot,CoffeeRobot>(
           c => new CoffeeRobot(
                     new FrenchPress(),
-                    DiContainer.Resolve<Water>(),
+                    IocContainer.Resolve<Water>(),
                     new Grinder()),
           "plunger");
 
-        var robot1 = DiContainer.Resolve<CoffeeRobot>("pour_over");
-        var robot2 = DiContainer.Resolve<CoffeeRobot>("plunger");
-        var robot3 = DiContainer.Resolve<CoffeeRobot>("pour_over");
-        var robot4 = DiContainer.Resolve<CoffeeRobot>("plunger");
-        var robot5 = DiContainer.Resolve<CoffeeRobot>("plunger");
+        var robot1 = IocContainer.Resolve<CoffeeRobot>("pour_over");
+        var robot2 = IocContainer.Resolve<CoffeeRobot>("plunger");
+        var robot3 = IocContainer.Resolve<CoffeeRobot>("pour_over");
+        var robot4 = IocContainer.Resolve<CoffeeRobot>("plunger");
+        var robot5 = IocContainer.Resolve<CoffeeRobot>("plunger");
 
         Console.WriteLine();
 
@@ -424,27 +424,27 @@ public class Program
 {
     static void Main(string[] args)
     {
-        DiContainer.Register<Water, FilteredWater>().SingleInstance();
+        IocContainer.Register<Water, FilteredWater>().SingleInstance();
 
-        DiContainer.RegisterExplicit<CoffeeRobot,CoffeeRobot>(
+        IocContainer.RegisterExplicit<CoffeeRobot,CoffeeRobot>(
           c => new CoffeeRobot(
                     new Chemex(new FilterPaper()),
-                    DiContainer.Resolve<Water>(),
+                    IocContainer.Resolve<Water>(),
                     new Grinder()),
           "pour_over");
 
-        DiContainer.RegisterExplicit<CoffeeRobot,CoffeeRobot>(
+        IocContainer.RegisterExplicit<CoffeeRobot,CoffeeRobot>(
           c => new CoffeeRobot(
                     new FrenchPress(),
-                    DiContainer.Resolve<Water>(),
+                    IocContainer.Resolve<Water>(),
                     new Grinder()),
           "plunger");
 
-        var robot1 = DiContainer.Resolve<CoffeeRobot>("pour_over");
-        var robot2 = DiContainer.Resolve<CoffeeRobot>("plunger");
-        var robot3 = DiContainer.Resolve<CoffeeRobot>("pour_over");
-        var robot4 = DiContainer.Resolve<CoffeeRobot>("plunger");
-        var robot5 = DiContainer.Resolve<CoffeeRobot>("plunger");
+        var robot1 = IocContainer.Resolve<CoffeeRobot>("pour_over");
+        var robot2 = IocContainer.Resolve<CoffeeRobot>("plunger");
+        var robot3 = IocContainer.Resolve<CoffeeRobot>("pour_over");
+        var robot4 = IocContainer.Resolve<CoffeeRobot>("plunger");
+        var robot5 = IocContainer.Resolve<CoffeeRobot>("plunger");
 
         Console.WriteLine();
 
