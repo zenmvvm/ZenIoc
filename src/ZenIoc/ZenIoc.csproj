@@ -29,6 +29,8 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>  	
     <IncludeSymbols>true</IncludeSymbols>
+
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   
   <ItemGroup>
