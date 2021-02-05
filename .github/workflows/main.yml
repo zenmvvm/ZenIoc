@@ -81,33 +81,33 @@ jobs:
         if: matrix.os == 'ubuntu-latest' && github.ref != 'refs/heads/develop' && github.event_name != 'release'
         run: dotnet nuget push ./src/${{ env.PROJECT_NAME }}/bin/Release/*.nupkg --source $MYGET_FEED --skip-duplicate --api-key $MYGET_KEY
 
-dependabotautomerge:
-  # from https://localheinz.com/blog/2020/06/15/merging-pull-requests-with-github-actions/
-  needs: build
-  if: >
-    github.event_name == 'pull_request' &&
-    github.event.pull_request.draft == false && (
-      github.event.action == 'opened' ||
-      github.event.action == 'reopened' ||
-      github.event.action == 'synchronize'
-    ) && (
-    github.actor == 'dependabot[bot]'
-    )
-  runs-on: ubuntu-latest
-  steps:
-    - name: automerge
-      uses: actions/github-script@0.2.0
-      with:
-        script: |
-          const pullRequest = context.payload.pull_request
-          const repository = context.repo
-          await github.pulls.merge({
-            merge_method: "merge",
-            owner: repository.owner,
-            pull_number: pullRequest.number,
-            repo: repository.repo,
-            })
-        github-token: ${{github.token}}
+  dependabotautomerge:
+    # from https://localheinz.com/blog/2020/06/15/merging-pull-requests-with-github-actions/
+    needs: build
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.draft == false && (
+        github.event.action == 'opened' ||
+        github.event.action == 'reopened' ||
+        github.event.action == 'synchronize'
+      ) && (
+      github.actor == 'dependabot[bot]'
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - name: automerge
+        uses: actions/github-script@0.2.0
+        with:
+          script: |
+            const pullRequest = context.payload.pull_request
+            const repository = context.repo
+            await github.pulls.merge({
+              merge_method: "merge",
+              owner: repository.owner,
+              pull_number: pullRequest.number,
+              repo: repository.repo,
+              })
+          github-token: ${{github.token}}
           
   prerelease:
     needs: build
