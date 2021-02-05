@@ -1,0 +1,16 @@
+version: 2
+updates:
+- package-ecosystem: nuget
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+#  ignore:
+#      - dependency-name: "SomeDependency"
+
+# Uncomment to enable dependabot for github-actions
+# - package-ecosystem: github-actions
+#   directory: "/"
+#   schedule:
+#     interval: daily
+#   open-pull-requests-limit: 10
