@@ -1,7 +1,7 @@
 # ![Logo](art/icon@64x64.png) ZenIoc
 Description here
 
-[![Coverage](https://raw.githubusercontent.com/zenmvvm/ZenIoc/develop/coverage/badge_linecoverage.svg)](https://htmlpreview.github.io/?https://raw.githubusercontent.com/zenmvvm/ZenIoc/develop/coverage/index.html) [![NuGet](https://buildstats.info/nuget/ZenIoc?includePreReleases=false)](https://www.nuget.org/packages/ZenIoc/)
+[![Coverage](https://raw.githubusercontent.com/zenmvvm/ZenIoc/develop/coverage/badge_linecoverage.svg)](https://htmlpreview.github.io/?https://raw.githubusercontent.com/zenmvvm/ZenIoc/develop/coverage/index.html) [![NuGet](https://buildstats.info/nuget/ZenIoc?includePreReleases=false)](https://www.nuget.org/packages/ZenIoc/)![CI](https://github.com/zenmvvm/ZenIoc/workflows/CI/badge.svg?branch=main)
 
 
 A Template solution directory with:
