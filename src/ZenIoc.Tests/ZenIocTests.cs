@@ -948,6 +948,8 @@ namespace ZenIocTests
         [Fact]
         public void ResolveIEnumerableAbstract_NotRegistered()
         {
+            IocContainer.Initialize(o => {o.TryResolveUnregistered = true; });
+
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
             IocContainer.SetContainer(mock);
 
