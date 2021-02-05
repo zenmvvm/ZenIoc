@@ -50,7 +50,7 @@ namespace ZenIoc
         }
 
         /// <summary>
-        /// Gets the default <see cref="ContainerOptions"/> used across all <see cref="DiContainer"/> instances.
+        /// Gets the default <see cref="ContainerOptions"/> used across all <see cref="IocContainer"/> instances.
         /// </summary>
         public static ContainerOptions Default => DefaultOptions.Value;
 
@@ -93,7 +93,7 @@ namespace ZenIoc
     /// <summary>
     /// Interface for the dependency injection container
     /// </summary>
-    public interface IDiContainer : IDisposable
+    public interface IIocContainer : IDisposable
     {
         /// <summary>
         /// Optional name to identify the container with. Useful if using more than one container.
@@ -106,29 +106,29 @@ namespace ZenIoc
         /// </summary>
         /// <param name="name">The container's name</param>
         /// <returns></returns>
-        IDiContainer GetContainer(string name);
+        IIocContainer GetContainer(string name);
 
         /// <summary>
         /// Get the current container's parent container.
         ///  Will be <c>null</c> if the current instance
         ///  is not a child container.
         /// </summary>
-        IDiContainer GetParent();
+        IIocContainer GetParent();
 
         /// <summary>
         /// Get the current container's child container. 
         ///  Will be <c>null</c> if no child has been created.
         /// </summary>
-        IReadOnlyList<IDiContainer> GetChildren();
+        IReadOnlyList<IIocContainer> GetChildren();
 
         /// <summary>
         /// Registers a new child container and sets
         ///  its Parent to the current
         ///  instance.
         /// </summary>
-        /// <returns>A new <see cref="IDiContainer"/> child
+        /// <returns>A new <see cref="IIocContainer"/> child
         ///  container</returns>
-        IDiContainer NewChildContainer(string name = null);
+        IIocContainer NewChildContainer(string name = null);
 
         /// <summary>
         /// Registers a Type in the container.
@@ -232,7 +232,7 @@ namespace ZenIoc
         /// <typeparam name="TConcrete">Type to be instantiated</typeparam>
         /// <param name="instanceDelegate">The lambda expression</param>
         /// <returns>Fluent API</returns>
-        RegisterOptions RegisterExplicit<TResolved, TConcrete>(Expression<Func<IDiContainer, TConcrete>> instanceDelegate)
+        RegisterOptions RegisterExplicit<TResolved, TConcrete>(Expression<Func<IIocContainer, TConcrete>> instanceDelegate)
             where TConcrete : notnull, TResolved;
 
         /// <summary>
@@ -243,7 +243,7 @@ namespace ZenIoc
         /// <param name="instanceDelegate">The lambda expression</param>
         /// <param name="key">Named Type which allows for multiple registrations of the same Type, identified with different keys</param>
         /// <returns>Fluent API</returns>
-        RegisterOptions RegisterExplicit<TResolved, TConcrete>(Expression<Func<IDiContainer, TConcrete>> instanceDelegate, string key)
+        RegisterOptions RegisterExplicit<TResolved, TConcrete>(Expression<Func<IIocContainer, TConcrete>> instanceDelegate, string key)
             where TConcrete : notnull, TResolved;
 
         /// <summary>
@@ -347,26 +347,26 @@ namespace ZenIoc
     }
 
     /// <summary>
-    /// Extensions to avoid having to cast DiContainer instance
-    /// to IDiContainer when trying to access its methods.
+    /// Extensions to avoid having to cast IocContainer instance
+    /// to IIocContainer when trying to access its methods.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class IDiContainerExtensions
+    public static class IIocContainerExtensions
     {
         /// <summary>
-        /// Retrieves a container, identified by its <see cref="IDiContainer.Name"/>
+        /// Retrieves a container, identified by its <see cref="IIocContainer.Name"/>
         /// </summary>
         /// <param name="name">The container's name</param>
         /// <returns></returns>
         /// <param name="diContainer"></param>
-        public static IDiContainer GetContainer(this IDiContainer diContainer, string name)
+        public static IIocContainer GetContainer(this IIocContainer diContainer, string name)
             => diContainer.GetContainer(name);
 
         /// <summary>
         /// Get the current container's child container. 
         ///  Will be <c>null</c> if no child has been created.
         /// </summary>
-        public static IReadOnlyList<IDiContainer> GetChildren(this IDiContainer diContainer)
+        public static IReadOnlyList<IIocContainer> GetChildren(this IIocContainer diContainer)
             => diContainer.GetChildren();
 
         /// <summary>
@@ -374,9 +374,9 @@ namespace ZenIoc
         ///  its Parent to the current
         ///  instance.
         /// </summary>
-        /// <returns>A new <see cref="IDiContainer"/> child
+        /// <returns>A new <see cref="IIocContainer"/> child
         ///  container</returns>
-        public static IDiContainer NewChildContainer(this IDiContainer container, string name = null)
+        public static IIocContainer NewChildContainer(this IIocContainer container, string name = null)
             => container.NewChildContainer(name);
 
         /// <summary>
@@ -387,7 +387,7 @@ namespace ZenIoc
         /// <param name="key">Optional key which allows multiple registrations with the same <paramref name="resolvedType"/></param>
         /// <returns>Fluent API</returns>
         ///  <param name="diContainer"></param>
-        public static IRegisterOptions RegisterType(this IDiContainer diContainer, Type concreteType, Type resolvedType = null, string key = null)
+        public static IRegisterOptions RegisterType(this IIocContainer diContainer, Type concreteType, Type resolvedType = null, string key = null)
             => diContainer.RegisterType(concreteType, resolvedType, key);
 
         /// <summary>
@@ -399,7 +399,7 @@ namespace ZenIoc
         /// <param name="constructorParameters">If provided, will specify the specific contructor to be used to instantiate the <paramref name="concreteType"/>. A constructor with matching parameters will be used.</param>
         /// <returns>Fluent API</returns>
         ///  <param name="diContainer"></param>
-        public static IRegisterOptions RegisterType(this IDiContainer diContainer, Type concreteType, Type resolvedType = null, string key = null, params Type[] constructorParameters)
+        public static IRegisterOptions RegisterType(this IIocContainer diContainer, Type concreteType, Type resolvedType = null, string key = null, params Type[] constructorParameters)
             => diContainer.RegisterType(concreteType, resolvedType, key, constructorParameters);
 
         /// <summary>
@@ -408,7 +408,7 @@ namespace ZenIoc
         /// <typeparam name="TConcrete">Type to be instantiated</typeparam>
         /// <returns>Fluent API</returns>
         ///  <param name="diContainer"></param>
-        public static RegisterOptions Register<TConcrete>(this IDiContainer diContainer)
+        public static RegisterOptions Register<TConcrete>(this IIocContainer diContainer)
             where TConcrete : notnull
             => diContainer.Register<TConcrete>();
         /// <summary>
@@ -418,7 +418,7 @@ namespace ZenIoc
         /// <typeparam name="TConcrete">Type to be instantiated</typeparam>
         /// <returns>Fluent API</returns>
         ///  <param name="diContainer"></param>
-        public static RegisterOptions Register<TResolved, TConcrete>(this IDiContainer diContainer)
+        public static RegisterOptions Register<TResolved, TConcrete>(this IIocContainer diContainer)
             where TConcrete : notnull, TResolved
             => diContainer.Register<TResolved, TConcrete>();
 
@@ -429,7 +429,7 @@ namespace ZenIoc
         /// <param name="key">Named Type which allows for multiple registrations of the same Type, identified with different keys</param>
         /// <returns>Fluent API</returns>
         ///  <param name="diContainer"></param>
-        public static RegisterOptions Register<TConcrete>(this IDiContainer diContainer, string key)
+        public static RegisterOptions Register<TConcrete>(this IIocContainer diContainer, string key)
             where TConcrete : notnull
             => diContainer.Register<TConcrete>(key);
 
@@ -441,7 +441,7 @@ namespace ZenIoc
         /// <param name="key">Named Type which allows for multiple registrations of the same Type, identified with different keys</param>
         /// <returns>Fluent API</returns>
         ///  <param name="diContainer"></param>
-        public static RegisterOptions Register<TResolved, TConcrete>(this IDiContainer diContainer, string key)
+        public static RegisterOptions Register<TResolved, TConcrete>(this IIocContainer diContainer, string key)
             where TConcrete : notnull, TResolved
             => diContainer.Register<TResolved, TConcrete>(key);
 
@@ -453,7 +453,7 @@ namespace ZenIoc
         /// <param name="constructorParameters">Will specify the specific contructor to be used to instantiate the <typeparamref name="TConcrete"/>. A constructor with matching parameters will be used.</param>
         /// <returns>Fluent API</returns>
         ///  <param name="diContainer"></param>
-        public static RegisterOptions Register<TConcrete>(this IDiContainer diContainer, params Type[] constructorParameters)
+        public static RegisterOptions Register<TConcrete>(this IIocContainer diContainer, params Type[] constructorParameters)
             where TConcrete : notnull
             => diContainer.Register<TConcrete>(constructorParameters);
 
@@ -465,7 +465,7 @@ namespace ZenIoc
         /// <param name="constructorParameters">Will specify the specific contructor to be used to instantiate the <typeparamref name="TConcrete"/>. A constructor with matching parameters will be used.</param>
         /// <returns>Fluent API</returns>
         ///  <param name="diContainer"></param>
-        public static RegisterOptions Register<TResolved, TConcrete>(this IDiContainer diContainer, params Type[] constructorParameters)
+        public static RegisterOptions Register<TResolved, TConcrete>(this IIocContainer diContainer, params Type[] constructorParameters)
             where TConcrete : notnull, TResolved
             => diContainer.Register<TResolved, TConcrete>(constructorParameters);
 
@@ -477,7 +477,7 @@ namespace ZenIoc
         /// <param name="key">Named Type which allows for multiple registrations of the same Type, identified with different keys</param>
         /// <returns>Fluent API</returns>
         ///  <param name="diContainer"></param>
-        public static RegisterOptions Register<TConcrete>(this IDiContainer diContainer, string key, params Type[] constructorParameters)
+        public static RegisterOptions Register<TConcrete>(this IIocContainer diContainer, string key, params Type[] constructorParameters)
             where TConcrete : notnull
             => diContainer.Register<TConcrete>(key, constructorParameters);
 
@@ -490,7 +490,7 @@ namespace ZenIoc
         /// <param name="key">Named Type which allows for multiple registrations of the same Type, identified with different keys</param>
         /// <returns>Fluent API</returns>
         ///  <param name="diContainer"></param>
-        public static RegisterOptions Register<TResolved, TConcrete>(this IDiContainer diContainer, string key, params Type[] constructorParameters)
+        public static RegisterOptions Register<TResolved, TConcrete>(this IIocContainer diContainer, string key, params Type[] constructorParameters)
             where TConcrete : notnull, TResolved
             => diContainer.Register<TResolved, TConcrete>(key, constructorParameters);
 
@@ -502,7 +502,7 @@ namespace ZenIoc
         /// <param name="instanceDelegate">The lambda expression</param>
         /// <returns>Fluent API</returns>
         ///  <param name="diContainer"></param>
-        public static RegisterOptions RegisterExplicit<TResolved, TConcrete>(this IDiContainer diContainer, Expression<Func<IDiContainer, TConcrete>> instanceDelegate)
+        public static RegisterOptions RegisterExplicit<TResolved, TConcrete>(this IIocContainer diContainer, Expression<Func<IIocContainer, TConcrete>> instanceDelegate)
             where TConcrete : notnull, TResolved
             => diContainer.RegisterExplicit<TResolved, TConcrete>(instanceDelegate);
 
@@ -515,7 +515,7 @@ namespace ZenIoc
         /// <param name="key">Named Type which allows for multiple registrations of the same Type, identified with different keys</param>
         /// <returns>Fluent API</returns>
         ///  <param name="diContainer"></param>
-        public static RegisterOptions RegisterExplicit<TResolved, TConcrete>(this IDiContainer diContainer, Expression<Func<IDiContainer, TConcrete>> instanceDelegate, string key)
+        public static RegisterOptions RegisterExplicit<TResolved, TConcrete>(this IIocContainer diContainer, Expression<Func<IIocContainer, TConcrete>> instanceDelegate, string key)
             where TConcrete : notnull, TResolved
             => diContainer.RegisterExplicit<TResolved, TConcrete>(instanceDelegate, key);
 
@@ -524,7 +524,7 @@ namespace ZenIoc
         /// </summary>
         /// <param name="instance">The object instance</param>
         ///  <param name="diContainer"></param>
-        public static void RegisterInstance(this IDiContainer diContainer, object instance)
+        public static void RegisterInstance(this IIocContainer diContainer, object instance)
             => diContainer.RegisterInstance(instance);
 
         /// <summary>
@@ -533,7 +533,7 @@ namespace ZenIoc
         /// <typeparam name="TResolved">Type to be resolved as</typeparam>
         /// <param name="instance">The object instance</param>
         ///  <param name="diContainer"></param>
-        public static void RegisterInstance<TResolved>(this IDiContainer diContainer, object instance)
+        public static void RegisterInstance<TResolved>(this IIocContainer diContainer, object instance)
             where TResolved : notnull
             => diContainer.RegisterInstance<TResolved>(instance);
 
@@ -543,7 +543,7 @@ namespace ZenIoc
         /// <param name="instance">The object instance</param>
         /// <param name="key">Named Type which allows for multiple registrations of the same Type, identified with different keys</param>
         ///  <param name="diContainer"></param>
-        public static void RegisterInstance(this IDiContainer diContainer, object instance, string key)
+        public static void RegisterInstance(this IIocContainer diContainer, object instance, string key)
             => diContainer.RegisterInstance(instance, key);
 
         /// <summary>
@@ -553,7 +553,7 @@ namespace ZenIoc
         /// <param name="instance">The object instance</param>
         /// <param name="key">Named Type which allows for multiple registrations of the same Type, identified with different keys</param>
         ///  <param name="diContainer"></param>
-        public static void RegisterInstance<TResolved>(this IDiContainer diContainer, object instance, string key)
+        public static void RegisterInstance<TResolved>(this IIocContainer diContainer, object instance, string key)
             where TResolved : notnull
             => diContainer.RegisterInstance<TResolved>(instance, key);
 
@@ -563,7 +563,7 @@ namespace ZenIoc
         /// <typeparam name="TResolved">The interface / abstract class</typeparam>
         /// <param name="lifeCycle"></param>
         ///  <param name="diContainer"></param>
-        public static void RegisterTypesOf<TResolved>(this IDiContainer diContainer, LifeCycle lifeCycle)
+        public static void RegisterTypesOf<TResolved>(this IIocContainer diContainer, LifeCycle lifeCycle)
             where TResolved : notnull
             => diContainer.RegisterTypesOf<TResolved>(lifeCycle);
 
@@ -572,7 +572,7 @@ namespace ZenIoc
         ///  first-time resolution
         /// </summary>
         ///  <param name="diContainer"></param>
-        public static void Compile(this IDiContainer diContainer)
+        public static void Compile(this IIocContainer diContainer)
             => diContainer.Compile();
 
         /// <summary>
@@ -581,7 +581,7 @@ namespace ZenIoc
         /// <typeparam name="T">Type to Resolve</typeparam>
         /// <returns>An instance of type <typeparamref name="T"/></returns>
         ///  <param name="diContainer"></param>
-        public static T Resolve<T>(this IDiContainer diContainer) where T : notnull
+        public static T Resolve<T>(this IIocContainer diContainer) where T : notnull
             => diContainer.Resolve<T>();
 
         /// <summary>
@@ -591,7 +591,7 @@ namespace ZenIoc
         /// <param name="key">The key with which it was registered</param>
         /// <returns>An instance of type <typeparamref name="T"/></returns>
         ///  <param name="diContainer"></param>
-        public static T Resolve<T>(this IDiContainer diContainer, string key) where T : notnull
+        public static T Resolve<T>(this IIocContainer diContainer, string key) where T : notnull
             => diContainer.Resolve<T>(key);
 
         /// <summary>
@@ -600,7 +600,7 @@ namespace ZenIoc
         /// <param name="type">The Type to resolve</param>
         /// <returns>An object of the specified type</returns>
         ///  <param name="diContainer"></param>
-        public static object Resolve(this IDiContainer diContainer, Type type)
+        public static object Resolve(this IIocContainer diContainer, Type type)
             => diContainer.Resolve(type);
 
         /// <summary>
@@ -610,7 +610,7 @@ namespace ZenIoc
         /// <param name="key">The key with which it was registered</param>
         /// <returns>An object of the specified type</returns>
         ///  <param name="diContainer"></param>
-        public static object Resolve(this IDiContainer diContainer, Type type, string key)
+        public static object Resolve(this IIocContainer diContainer, Type type, string key)
             => diContainer.Resolve(type, key);
 
         /// <summary>
@@ -620,7 +620,7 @@ namespace ZenIoc
         /// </summary>
         /// <typeparam name="T">The Type to de-register</typeparam>
         ///  <param name="diContainer"></param>
-        public static void Unregister<T>(this IDiContainer diContainer)
+        public static void Unregister<T>(this IIocContainer diContainer)
             where T : notnull
             => diContainer.Unregister<T>();
 
@@ -632,7 +632,7 @@ namespace ZenIoc
         /// <typeparam name="T">The Type to de-register</typeparam>
         /// <param name="key">The key with which it was registered</param>
         ///  <param name="diContainer"></param>
-        public static void Unregister<T>(this IDiContainer diContainer, string key)
+        public static void Unregister<T>(this IIocContainer diContainer, string key)
             where T : notnull
             => diContainer.Unregister<T>(key);
 
@@ -642,21 +642,21 @@ namespace ZenIoc
         ///  it.
         /// </summary>
         ///  <param name="diContainer"></param>
-        public static void UnregisterAll(this IDiContainer diContainer)
+        public static void UnregisterAll(this IIocContainer diContainer)
             => diContainer.UnregisterAll();
 
         /// <summary>
         /// Disposes the container and all its registrations
         /// </summary>
         /// <param name="diContainer"></param>
-        public static void Dispose(this IDiContainer diContainer)
+        public static void Dispose(this IIocContainer diContainer)
             => diContainer.Dispose();
     }
 
     /// <summary>
     /// Dependency injection container
     /// </summary>
-    public class DiContainer : IDiContainer
+    public class IocContainer : IIocContainer
     {
         string name;
         ///<inheritdoc/>
@@ -675,18 +675,18 @@ namespace ZenIoc
             }
         }
 
-        internal static readonly ConcurrentDictionary<string, IDiContainer> containers = new ConcurrentDictionary<string, IDiContainer>();
+        internal static readonly ConcurrentDictionary<string, IIocContainer> containers = new ConcurrentDictionary<string, IIocContainer>();
 
         /// <summary>
         /// Retrieves a container, identified by its <see cref="Name"/>
         /// </summary>
         /// <param name="name">The container's name</param>
         /// <returns></returns>
-        public static IDiContainer GetContainer(string name)
-            => (Instance as IDiContainer).GetContainer(name);
+        public static IIocContainer GetContainer(string name)
+            => (Instance as IIocContainer).GetContainer(name);
         ///<inheritdoc/>
-        IDiContainer IDiContainer.GetContainer(string name)
-        => containers.TryGetValue(name, out IDiContainer container)
+        IIocContainer IIocContainer.GetContainer(string name)
+        => containers.TryGetValue(name, out IIocContainer container)
             ? container
             : throw new KeyNotFoundException(
                 "Couldn't retrieve container. Is the name correct?");
@@ -701,17 +701,17 @@ namespace ZenIoc
         /// Instantiate a new container
         /// </summary>
         /// <param name="name">Optional name for the container. Helpful if you plan on using many containers.</param>
-        public DiContainer(string name = null)
+        public IocContainer(string name = null)
         {
             Name = name ?? Guid.NewGuid().ToString();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DiContainer"/> class.
+        /// Initializes a new instance of the <see cref="IocContainer"/> class.
         /// </summary>
         /// <param name="options">The <see cref="ContainerOptions"/> instances that represents the configurable options.</param>
         /// <param name="name">Optional name for the container. Helpful if you plan on using many containers.</param>
-        public DiContainer(ContainerOptions options, string name = null) : this(o =>
+        public IocContainer(ContainerOptions options, string name = null) : this(o =>
         {
             o.TryResolveUnregistered = options.TryResolveUnregistered;
             o.ResolveShouldBubbleUpContainers = options.ResolveShouldBubbleUpContainers;
@@ -721,11 +721,11 @@ namespace ZenIoc
 
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DiContainer"/> class.
+        /// Initializes a new instance of the <see cref="IocContainer"/> class.
         /// </summary>
         /// <param name="configureOptions">A delegate used to configure <see cref="ContainerOptions"/>.</param>
         /// <param name="name">Optional name for the container. Helpful if you plan on using many containers.</param>
-        public DiContainer(Action<ContainerOptions> configureOptions, string name = null) : this(name)
+        public IocContainer(Action<ContainerOptions> configureOptions, string name = null) : this(name)
         {
             configureOptions(options);
         }
@@ -736,7 +736,7 @@ namespace ZenIoc
         /// <param name="container"></param>
         /// <param name="options">The <see cref="ContainerOptions"/> instances that represents the configurable options.</param>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public DiContainer(
+        public IocContainer(
             ConcurrentDictionary<Tuple<Type, string>, MetaObject> container, ContainerOptions options) : this(options)
         {
             this.container = container;
@@ -756,50 +756,50 @@ namespace ZenIoc
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void ResetContainer()
         {
-            DiContainer.containers.Clear();
-            Instance = new DiContainer();
+            IocContainer.containers.Clear();
+            Instance = new IocContainer();
         }
 
         /// <summary>
-        /// Initializes the Singleton intance of the <see cref="DiContainer"/>
+        /// Initializes the Singleton intance of the <see cref="IocContainer"/>
         /// class with user-specified options. 
         /// </summary>
         /// <remarks>Will only apply to the singleton, and will recreate the container (erasing any registrations)</remarks>
         /// <param name="options">The <see cref="ContainerOptions"/> instances that represents the configurable options.</param>
         public static void Initialize(ContainerOptions options)
         {
-            DiContainer.containers.Clear();
-            Instance = new DiContainer(options);
+            IocContainer.containers.Clear();
+            Instance = new IocContainer(options);
         }
 
         /// <summary>
-        /// Initializes the Singleton intance of the <see cref="DiContainer"/>
+        /// Initializes the Singleton intance of the <see cref="IocContainer"/>
         /// class with user-specified options. 
         /// </summary>
         /// <remarks>Will only apply to the singleton, and will recreate the container (erasing any registrations)</remarks>
         /// <param name="configureOptions">A delegate used to configure <see cref="ContainerOptions"/>.</param>
         public static void Initialize(Action<ContainerOptions> configureOptions)
         {
-            DiContainer.containers.Clear();
-            Instance = new DiContainer(configureOptions);
+            IocContainer.containers.Clear();
+            Instance = new IocContainer(configureOptions);
         }
 
-        internal static DiContainer Instance { get; private set; } = new DiContainer();
+        internal static IocContainer Instance { get; private set; } = new IocContainer();
 
-        private IDiContainer parent;
+        private IIocContainer parent;
         ///<inheritdoc/>
-        public IDiContainer GetParent()
+        public IIocContainer GetParent()
             => parent;
 
-        private readonly List<IDiContainer> children = new List<IDiContainer>();
+        private readonly List<IIocContainer> children = new List<IIocContainer>();
         /// <summary>
         /// Get the current container's child container. 
         ///  Will be <c>null</c> if no child has been created.
         /// </summary>
-        public static IReadOnlyList<IDiContainer> GetChildren()
-            => (Instance as IDiContainer).GetChildren();
+        public static IReadOnlyList<IIocContainer> GetChildren()
+            => (Instance as IIocContainer).GetChildren();
         ///<inheritdoc/>
-        IReadOnlyList<IDiContainer> IDiContainer.GetChildren()
+        IReadOnlyList<IIocContainer> IIocContainer.GetChildren()
             => children;
 
         internal ConcurrentDictionary<Tuple<Type, string>, MetaObject> container = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
@@ -811,14 +811,14 @@ namespace ZenIoc
         ///  its Parent to the current
         ///  instance.
         /// </summary>
-        /// <returns>A new <see cref="IDiContainer"/> child
+        /// <returns>A new <see cref="IIocContainer"/> child
         ///  container</returns>
-        public static IDiContainer NewChildContainer(string name = null)
-            => (Instance as IDiContainer).NewChildContainer(name);
+        public static IIocContainer NewChildContainer(string name = null)
+            => (Instance as IIocContainer).NewChildContainer(name);
         ///<inheritdoc/>
-        IDiContainer IDiContainer.NewChildContainer(string name)
+        IIocContainer IIocContainer.NewChildContainer(string name)
         {
-            var child = new DiContainer(name)
+            var child = new IocContainer(name)
             {
                 parentContainer = this.container,
                 parent = this
@@ -840,11 +840,11 @@ namespace ZenIoc
         /// <returns>Fluent API</returns>
         public static RegisterOptions Register<TConcrete>()
             where TConcrete : notnull
-            => (Instance as IDiContainer).Register<TConcrete>(constructorParameters: null);
+            => (Instance as IIocContainer).Register<TConcrete>(constructorParameters: null);
 
         ///<inheritdoc/>
-        RegisterOptions IDiContainer.Register<TConcrete>()
-            => (this as IDiContainer).Register<TConcrete>(constructorParameters: null);
+        RegisterOptions IIocContainer.Register<TConcrete>()
+            => (this as IIocContainer).Register<TConcrete>(constructorParameters: null);
 
 
         /// <summary>
@@ -855,10 +855,10 @@ namespace ZenIoc
         /// <returns>Fluent API</returns>
         public static RegisterOptions Register<TConcrete>(params Type[] constructorParameters)
             where TConcrete : notnull
-            => (Instance as IDiContainer).Register<TConcrete>(constructorParameters);
+            => (Instance as IIocContainer).Register<TConcrete>(constructorParameters);
 
         ///<inheritdoc/>
-        RegisterOptions IDiContainer.Register<TConcrete>(params Type[] constructorParameters)
+        RegisterOptions IIocContainer.Register<TConcrete>(params Type[] constructorParameters)
             => new RegisterOptions(
                 container,
                 InternalRegister(container, null, null, new MetaObject(typeof(TConcrete), LifeCycle.Transient, constructorParameters)));
@@ -872,11 +872,11 @@ namespace ZenIoc
         /// <returns>Fluent API</returns>
         public static RegisterOptions Register<TResolved, TConcrete>()
             where TConcrete : notnull, TResolved
-            => (Instance as IDiContainer).Register<TResolved, TConcrete>(constructorParameters: null);
+            => (Instance as IIocContainer).Register<TResolved, TConcrete>(constructorParameters: null);
 
         ///<inheritdoc/>
-        RegisterOptions IDiContainer.Register<TResolved, TConcrete>()
-            => (this as IDiContainer).Register<TResolved, TConcrete>(constructorParameters: null);
+        RegisterOptions IIocContainer.Register<TResolved, TConcrete>()
+            => (this as IIocContainer).Register<TResolved, TConcrete>(constructorParameters: null);
 
         /// <summary>
         /// Register a Type in the container, specifying a constructor.
@@ -887,10 +887,10 @@ namespace ZenIoc
         /// <returns>Fluent API</returns>
         public static RegisterOptions Register<TResolved, TConcrete>(params Type[] constructorParameters)
             where TConcrete : notnull, TResolved
-            => (Instance as IDiContainer).Register<TResolved, TConcrete>(constructorParameters);
+            => (Instance as IIocContainer).Register<TResolved, TConcrete>(constructorParameters);
 
         ///<inheritdoc/>
-        RegisterOptions IDiContainer.Register<TResolved, TConcrete>(params Type[] constructorParameters)
+        RegisterOptions IIocContainer.Register<TResolved, TConcrete>(params Type[] constructorParameters)
             => new RegisterOptions(
                 container,
                 InternalRegister(container, typeof(TResolved), null, new MetaObject(typeof(TConcrete), LifeCycle.Transient, constructorParameters)));
@@ -907,11 +907,11 @@ namespace ZenIoc
         /// <returns>Fluent API</returns>
         public static RegisterOptions Register<TConcrete>(string key)
             where TConcrete : notnull
-            => (Instance as IDiContainer).Register<TConcrete>(key, constructorParameters: null);
+            => (Instance as IIocContainer).Register<TConcrete>(key, constructorParameters: null);
 
         ///<inheritdoc/>
-        RegisterOptions IDiContainer.Register<TConcrete>(string key)
-            => (this as IDiContainer).Register<TConcrete>(key, constructorParameters: null);
+        RegisterOptions IIocContainer.Register<TConcrete>(string key)
+            => (this as IIocContainer).Register<TConcrete>(key, constructorParameters: null);
 
         /// <summary>
         /// Register a Type in the container, with a key and specifying a constructor.
@@ -922,10 +922,10 @@ namespace ZenIoc
         /// <returns>Fluent API</returns>
         public static RegisterOptions Register<TConcrete>(string key, params Type[] constructorParameters)
             where TConcrete : notnull
-            => (Instance as IDiContainer).Register<TConcrete>(key, constructorParameters);
+            => (Instance as IIocContainer).Register<TConcrete>(key, constructorParameters);
 
         ///<inheritdoc/>
-        RegisterOptions IDiContainer.Register<TConcrete>(string key, params Type[] constructorParameters)
+        RegisterOptions IIocContainer.Register<TConcrete>(string key, params Type[] constructorParameters)
             => new RegisterOptions(
                 container,
                 InternalRegister(container, null, key, new MetaObject(typeof(TConcrete), LifeCycle.Transient, constructorParameters)));
@@ -941,11 +941,11 @@ namespace ZenIoc
         /// <returns>Fluent API</returns>
         public static RegisterOptions Register<TResolved, TConcrete>(string key)
             where TConcrete : notnull, TResolved
-            => (Instance as IDiContainer).Register<TResolved, TConcrete>(key, constructorParameters: null);
+            => (Instance as IIocContainer).Register<TResolved, TConcrete>(key, constructorParameters: null);
 
         ///<inheritdoc/>
-        RegisterOptions IDiContainer.Register<TResolved, TConcrete>(string key)
-            => (this as IDiContainer).Register<TResolved, TConcrete>(key, constructorParameters: null);
+        RegisterOptions IIocContainer.Register<TResolved, TConcrete>(string key)
+            => (this as IIocContainer).Register<TResolved, TConcrete>(key, constructorParameters: null);
 
         /// <summary>
         /// Register a Type in the container, with a key and specifying a constructor.
@@ -957,10 +957,10 @@ namespace ZenIoc
         /// <returns>Fluent API</returns>
         public static RegisterOptions Register<TResolved, TConcrete>(string key, params Type[] constructorParameters)
             where TConcrete : notnull, TResolved
-            => (Instance as IDiContainer).Register<TResolved, TConcrete>(key, constructorParameters);
+            => (Instance as IIocContainer).Register<TResolved, TConcrete>(key, constructorParameters);
 
         ///<inheritdoc/>
-        RegisterOptions IDiContainer.Register<TResolved, TConcrete>(string key, params Type[] constructorParameters)
+        RegisterOptions IIocContainer.Register<TResolved, TConcrete>(string key, params Type[] constructorParameters)
             => new RegisterOptions(
                 container,
                 InternalRegister(container, typeof(TResolved), key, new MetaObject(typeof(TConcrete), LifeCycle.Transient, constructorParameters)));
@@ -991,12 +991,12 @@ namespace ZenIoc
         /// <typeparam name="TConcrete">Type to be instantiated</typeparam>
         /// <param name="instanceDelegate">The lambda expression</param>
         /// <returns>Fluent API</returns>
-        public static RegisterOptions RegisterExplicit<TResolved, TConcrete>(Expression<Func<IDiContainer, TConcrete>> instanceDelegate)
+        public static RegisterOptions RegisterExplicit<TResolved, TConcrete>(Expression<Func<IIocContainer, TConcrete>> instanceDelegate)
             where TConcrete : notnull, TResolved
-            => (Instance as IDiContainer).RegisterExplicit<TResolved, TConcrete>(instanceDelegate);
+            => (Instance as IIocContainer).RegisterExplicit<TResolved, TConcrete>(instanceDelegate);
 
         ///<inheritdoc/>
-        RegisterOptions IDiContainer.RegisterExplicit<TResolved, TConcrete>(Expression<Func<IDiContainer, TConcrete>> instanceDelegate)
+        RegisterOptions IIocContainer.RegisterExplicit<TResolved, TConcrete>(Expression<Func<IIocContainer, TConcrete>> instanceDelegate)
             => new RegisterOptions(
                 container,
                 InternalRegister(container, typeof(TResolved), null, new MetaObject(typeof(TConcrete), LifeCycle.Transient, CastToUntypedOutput(instanceDelegate), new Tuple<Type, string>(typeof(TResolved), null))));
@@ -1011,13 +1011,13 @@ namespace ZenIoc
         /// <param name="instanceDelegate">The lambda expression</param>
         /// <param name="key">Named Type which allows for multiple registrations of the same Type, identified with different keys</param>
         /// <returns>Fluent API</returns>
-        public static RegisterOptions RegisterExplicit<TResolved, TConcrete>(Expression<Func<IDiContainer, TConcrete>>
+        public static RegisterOptions RegisterExplicit<TResolved, TConcrete>(Expression<Func<IIocContainer, TConcrete>>
  instanceDelegate, string key)
             where TConcrete : notnull, TResolved
-                => (Instance as IDiContainer).RegisterExplicit<TResolved, TConcrete>(instanceDelegate, key);
+                => (Instance as IIocContainer).RegisterExplicit<TResolved, TConcrete>(instanceDelegate, key);
 
         ///<inheritdoc/>
-        RegisterOptions IDiContainer.RegisterExplicit<TResolved, TConcrete>(Expression<Func<IDiContainer, TConcrete>> instanceDelegate, string key)
+        RegisterOptions IIocContainer.RegisterExplicit<TResolved, TConcrete>(Expression<Func<IIocContainer, TConcrete>> instanceDelegate, string key)
             => new RegisterOptions(
                 container,
                 InternalRegister(container, typeof(TResolved), key, new MetaObject(typeof(TConcrete), LifeCycle.Transient, CastToUntypedOutput(instanceDelegate), new Tuple<Type, string>(typeof(TResolved), key))));
@@ -1031,10 +1031,10 @@ namespace ZenIoc
         /// </summary>
         /// <param name="instance">The object instance</param>
         public static void RegisterInstance(object instance)
-            => (Instance as IDiContainer).RegisterInstance(instance);
+            => (Instance as IIocContainer).RegisterInstance(instance);
 
         ///<inheritdoc/>
-        void IDiContainer.RegisterInstance(object instance)
+        void IIocContainer.RegisterInstance(object instance)
             => new RegisterOptions(
                 container
                 , InternalRegister(container, null, null, new MetaObject(instance)));
@@ -1048,11 +1048,11 @@ namespace ZenIoc
         /// <param name="instance">The object instance</param>
         public static void RegisterInstance<TResolved>(object instance)
             where TResolved : notnull
-            => (Instance as IDiContainer).RegisterInstance<TResolved>(instance);
+            => (Instance as IIocContainer).RegisterInstance<TResolved>(instance);
         //todo Validate TResolved : TConcrete - perhaps bring type conversion forward to here : Can return typeof(TResolved to fit into one method call)
 
         ///<inheritdoc/>
-        void IDiContainer.RegisterInstance<TResolved>(object instance)
+        void IIocContainer.RegisterInstance<TResolved>(object instance)
             => new RegisterOptions(
                 container
                 , InternalRegister(container, typeof(TResolved), null, new MetaObject(instance)));
@@ -1064,10 +1064,10 @@ namespace ZenIoc
         /// <param name="instance">The object instance</param>
         /// <param name="key">Named Type which allows for multiple registrations of the same Type, identified with different keys</param>
         public static void RegisterInstance(object instance, string key)
-            => (Instance as IDiContainer).RegisterInstance(instance, key);
+            => (Instance as IIocContainer).RegisterInstance(instance, key);
 
         ///<inheritdoc/>
-        void IDiContainer.RegisterInstance(object instance, string key)
+        void IIocContainer.RegisterInstance(object instance, string key)
             => new RegisterOptions(
                 container
                 , InternalRegister(container, null, key, new MetaObject(instance)));
@@ -1081,10 +1081,10 @@ namespace ZenIoc
         /// <param name="key">Named Type which allows for multiple registrations of the same Type, identified with different keys</param>
         public static void RegisterInstance<TResolved>(object instance, string key)
             where TResolved : notnull
-            => (Instance as IDiContainer).RegisterInstance<TResolved>(instance, key);
+            => (Instance as IIocContainer).RegisterInstance<TResolved>(instance, key);
 
         ///<inheritdoc/>
-        void IDiContainer.RegisterInstance<TResolved>(object instance, string key)
+        void IIocContainer.RegisterInstance<TResolved>(object instance, string key)
             => new RegisterOptions(
                 container
                 , InternalRegister(container, typeof(TResolved), key, new MetaObject(instance)));
@@ -1096,9 +1096,9 @@ namespace ZenIoc
         /// <typeparam name="TResolved">The interface / abstract class</typeparam>
         /// <param name="lifeCycle"></param>
         public static void RegisterTypesOf<TResolved>(LifeCycle lifeCycle = LifeCycle.Transient) where TResolved : class
-            => (Instance as IDiContainer).RegisterTypesOf<TResolved>(lifeCycle);
+            => (Instance as IIocContainer).RegisterTypesOf<TResolved>(lifeCycle);
         ///<inheritdoc/>
-        void IDiContainer.RegisterTypesOf<TResolved>(LifeCycle lifeCycle)
+        void IIocContainer.RegisterTypesOf<TResolved>(LifeCycle lifeCycle)
             => InternalRegisterTypesOf(container, typeof(TResolved), lifeCycle);
 
         void InternalRegisterTypesOf(ConcurrentDictionary<Tuple<Type, string>, MetaObject> container, Type resolved, LifeCycle lifeCycle)
@@ -1170,11 +1170,11 @@ namespace ZenIoc
         /// <param name="key">Optional key which allows multiple registrations with the same <paramref name="resolvedType"/></param>
         /// <returns>Fluent API</returns>
         public static IRegisterOptions RegisterType(Type concreteType, Type resolvedType = null, string key = null)
-            => (Instance as IDiContainer).RegisterType(concreteType, resolvedType, key);
+            => (Instance as IIocContainer).RegisterType(concreteType, resolvedType, key);
 
         ///<inheritdoc/>
-        IRegisterOptions IDiContainer.RegisterType(Type concreteType, Type resolvedType, string key)
-            => (this as IDiContainer).RegisterType(concreteType, resolvedType, key, constructorParameters: null);
+        IRegisterOptions IIocContainer.RegisterType(Type concreteType, Type resolvedType, string key)
+            => (this as IIocContainer).RegisterType(concreteType, resolvedType, key, constructorParameters: null);
 
 
 
@@ -1187,10 +1187,10 @@ namespace ZenIoc
         /// <param name="constructorParameters">If provided, will specify the specific contructor to be used to instantiate the <paramref name="concreteType"/>. A constructor with matching parameters will be used.</param>
         /// <returns>Fluent API</returns>
         public static IRegisterOptions RegisterType(Type concreteType, Type resolvedType = null, string key = null, params Type[] constructorParameters)
-            => (Instance as IDiContainer).RegisterType(concreteType, resolvedType, key, constructorParameters);
+            => (Instance as IIocContainer).RegisterType(concreteType, resolvedType, key, constructorParameters);
 
         ///<inheritdoc/>
-        IRegisterOptions IDiContainer.RegisterType(Type concreteType, Type resolvedType, string key, params Type[] constructorParameters)
+        IRegisterOptions IIocContainer.RegisterType(Type concreteType, Type resolvedType, string key, params Type[] constructorParameters)
         {
             return new RegisterOptions(
                 container,
@@ -1209,10 +1209,10 @@ namespace ZenIoc
         ///  first-time resolution
         /// </summary>
         public static void Compile()
-            => (Instance as IDiContainer).Compile();
+            => (Instance as IIocContainer).Compile();
 
         ///<inheritdoc/>
-        void IDiContainer.Compile()
+        void IIocContainer.Compile()
         {
             foreach (var keyValuePair in container)
             {
@@ -1256,10 +1256,10 @@ namespace ZenIoc
         /// <typeparam name="T">Type to Resolve</typeparam>
         /// <returns>An instance of type <typeparamref name="T"/></returns>
         public static T Resolve<T>() where T : notnull
-            => (Instance as IDiContainer).Resolve<T>();
+            => (Instance as IIocContainer).Resolve<T>();
 
         ///<inheritdoc/>
-        T IDiContainer.Resolve<T>()
+        T IIocContainer.Resolve<T>()
             => (T)InternalResolve(container, typeof(T), null);
 
         /// <summary>
@@ -1269,10 +1269,10 @@ namespace ZenIoc
         /// <param name="key">The key with which it was registered</param>
         /// <returns>An instance of type <typeparamref name="T"/></returns>
         public static T Resolve<T>(string key) where T : notnull
-            => (Instance as IDiContainer).Resolve<T>(key);
+            => (Instance as IIocContainer).Resolve<T>(key);
 
         ///<inheritdoc/>
-        T IDiContainer.Resolve<T>(string key)
+        T IIocContainer.Resolve<T>(string key)
             => (T)InternalResolve(container, typeof(T), key);
 
         /// <summary>
@@ -1281,10 +1281,10 @@ namespace ZenIoc
         /// <param name="type">The Type to resolve</param>
         /// <returns>An object of the specified type</returns>
         public static object Resolve(Type type)
-            => (Instance as IDiContainer).Resolve(type);
+            => (Instance as IIocContainer).Resolve(type);
 
         ///<inheritdoc/>
-        object IDiContainer.Resolve(Type type)
+        object IIocContainer.Resolve(Type type)
             => InternalResolve(container, type, null);
 
         /// <summary>
@@ -1294,10 +1294,10 @@ namespace ZenIoc
         /// <param name="key">The key with which it was registered</param>
         /// <returns>An object of the specified type</returns>
         public static object Resolve(Type type, string key)
-            => (Instance as IDiContainer).Resolve(type, key);
+            => (Instance as IIocContainer).Resolve(type, key);
 
         ///<inheritdoc/>
-        object IDiContainer.Resolve(Type type, string key)
+        object IIocContainer.Resolve(Type type, string key)
             => InternalResolve(container, type, key);
 
 
@@ -1308,10 +1308,10 @@ namespace ZenIoc
 
             if (metaObject.LifeCycle is LifeCycle.Singleton)
                 return Expression.Call(
-                    MetaObject.IDiContainerParameter,
-                    typeof(IDiContainer)
+                    MetaObject.IIocContainerParameter,
+                    typeof(IIocContainer)
                         .GetMethod(
-                            nameof(IDiContainer.Resolve),
+                            nameof(IIocContainer.Resolve),
                             new Type[] { typeof(string) })
                         .MakeGenericMethod(resolvedType),
                     Expression.Constant(key, typeof(string)));
@@ -1429,7 +1429,7 @@ namespace ZenIoc
                     var builder = new StringBuilder();
                     builder.Append(
                         $"Could not Resolve or Create {resolvedType.Name}" +
-                        $". It is not registered in {nameof(DiContainer)}. Furthermore, " +
+                        $". It is not registered in {nameof(IocContainer)}. Furthermore, " +
                         $"smart resolve couldn't create an instance. ");
                     if (implementations.Count() == 0)
                         builder.AppendLine("No implementations were found.");
@@ -1511,10 +1511,10 @@ namespace ZenIoc
         /// <typeparam name="T">The Type to de-register</typeparam>
         public static void Unregister<T>()
             where T : notnull
-                => (Instance as IDiContainer).Unregister<T>();
+                => (Instance as IIocContainer).Unregister<T>();
 
         ///<inheritdoc/>
-        void IDiContainer.Unregister<T>()
+        void IIocContainer.Unregister<T>()
             => InternalUnregister(container, typeof(T), null);
 
         /// <summary>
@@ -1526,10 +1526,10 @@ namespace ZenIoc
         /// <param name="key">The key with which it was registered</param>
         public static void Unregister<T>(string key)
             where T : notnull
-                => (Instance as IDiContainer).Unregister<T>(key);
+                => (Instance as IIocContainer).Unregister<T>(key);
 
         ///<inheritdoc/>
-        void IDiContainer.Unregister<T>(string key)
+        void IIocContainer.Unregister<T>(string key)
             => InternalUnregister(container, typeof(T), key);
 
 
@@ -1554,10 +1554,10 @@ namespace ZenIoc
         ///  it.
         /// </summary>
         public static void UnregisterAll()
-            => (Instance as IDiContainer).UnregisterAll();
+            => (Instance as IIocContainer).UnregisterAll();
 
         ///<inheritdoc/>
-        void IDiContainer.UnregisterAll()
+        void IIocContainer.UnregisterAll()
             => InternalUnregisterAll(container);
 
 
@@ -1666,17 +1666,17 @@ namespace ZenIoc
         /// <param name="lifeCycle"></param>
         /// <param name="instanceDelegate"></param>
         /// <param name="key">Need to know its full dictionary key to make its uncompiled expression</param>
-        public MetaObject(Type concreteType, LifeCycle lifeCycle, Expression<Func<IDiContainer, object>> instanceDelegate, Tuple<Type, string> key) : this(concreteType, lifeCycle)
+        public MetaObject(Type concreteType, LifeCycle lifeCycle, Expression<Func<IIocContainer, object>> instanceDelegate, Tuple<Type, string> key) : this(concreteType, lifeCycle)
         {
             if (instanceDelegate is null)
                 throw new ArgumentNullException(nameof(instanceDelegate));
 
-            var resolveMethod = typeof(IDiContainer).GetMethod(nameof(IDiContainer.Resolve), new Type[] { typeof(string) }).MakeGenericMethod(key.Item1);
+            var resolveMethod = typeof(IIocContainer).GetMethod(nameof(IIocContainer.Resolve), new Type[] { typeof(string) }).MakeGenericMethod(key.Item1);
 
             //Cant set to instanceDelegate.Body because the parameter c is out of scope
             //...figure this out and you'll have a more elegant solution
             NewExpression = Expression.Call(
-                IDiContainerParameter,
+                IIocContainerParameter,
                 resolveMethod,
                 Expression.Constant(key.Item2, typeof(string)));
 
@@ -1707,7 +1707,7 @@ namespace ZenIoc
 
         internal object Instance { get; set; }
 
-        internal static ParameterExpression IDiContainerParameter { get; } = Expression.Parameter(typeof(IDiContainer), "c");
+        internal static ParameterExpression IIocContainerParameter { get; } = Expression.Parameter(typeof(IIocContainer), "c");
 
         Expression newExpression;
         internal Expression NewExpression
@@ -1719,8 +1719,8 @@ namespace ZenIoc
 
                 ActivationExpression = Expression.Lambda(
                     newExpression,
-                    IDiContainerParameter
-                    ).Compile() as Func<IDiContainer, object>;
+                    IIocContainerParameter
+                    ).Compile() as Func<IIocContainer, object>;
             }
         }
 
@@ -1731,13 +1731,13 @@ namespace ZenIoc
 
         internal ConstructorInfo ConstructorCache { get; }
 
-        internal Func<IDiContainer, object> ActivationExpression { get; private set; }
+        internal Func<IIocContainer, object> ActivationExpression { get; private set; }
 
         #endregion
 
         #region Methods
 
-        internal object GetObject(IDiContainer container)
+        internal object GetObject(IIocContainer container)
         {
             if (LifeCycle is LifeCycle.Singleton)
             {
@@ -1801,7 +1801,7 @@ namespace ZenIoc
                 }
 
                 //use aggregator to find greediest / leanest
-                if (DiContainer.options.ShouldPickGreediestConstructor)
+                if (IocContainer.options.ShouldPickGreediestConstructor)
                     return constructors
                         .Aggregate((i, j)
                             => i.GetParameters().Count() > j.GetParameters().Count()
@@ -1899,14 +1899,14 @@ namespace ZenIoc
         }
     }
     /// <summary>
-    /// Attribute to explicitly mark which constructor should be used by the <see cref="DiContainer"/>
+    /// Attribute to explicitly mark which constructor should be used by the <see cref="IocContainer"/>
     /// to instantiate the class
     /// </summary>
     [AttributeUsage(AttributeTargets.Constructor, AllowMultiple = false)]
     public class ResolveUsingAttribute : Attribute
     {
         /// <summary>
-        /// Attribute to explicitly mark which constructor should be used by the <see cref="DiContainer"/>
+        /// Attribute to explicitly mark which constructor should be used by the <see cref="IocContainer"/>
         /// to instantiate the class
         /// </summary>
         public ResolveUsingAttribute()

@@ -8,7 +8,7 @@ using System.Linq;
 namespace ZenIocTests
 {
     [Collection("ZenIoc")]
-    public class NewDiContainerTests
+    public class NewIocContainerTests
     {
         [Fact]
         public void Playground()
@@ -214,14 +214,14 @@ namespace ZenIocTests
         [Fact]
         public void Constructor()
         {
-            Assert.IsAssignableFrom<IDiContainer>(new DiContainer());
+            Assert.IsAssignableFrom<IIocContainer>(new IocContainer());
         }
 
         [Fact]
         public void InitializeStaticContainer()
         {
             //Not a real test
-            DiContainer.Initialize(new ContainerOptions {
+            IocContainer.Initialize(new ContainerOptions {
                 TryResolveUnregistered = false,
                 ResolveShouldBubbleUpContainers = false});
         }
@@ -233,10 +233,10 @@ namespace ZenIocTests
             {
                 TryResolveUnregistered = false
             };
-            using  var container = new DiContainer(options);
-            using var secondContainer = new DiContainer();
+            using  var container = new IocContainer(options);
+            using var secondContainer = new IocContainer();
 
-            Assert.False(DiContainer.options.TryResolveUnregistered);
+            Assert.False(IocContainer.options.TryResolveUnregistered);
         }
 
 
@@ -285,7 +285,7 @@ namespace ZenIocTests
         public void InnerRegister_ConcreteTypeIsNull_ThrowsArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() =>
-            DiContainer.Instance.InternalRegister(
+            IocContainer.Instance.InternalRegister(
                 new ConcurrentDictionary<Tuple<Type, string>, MetaObject>(),
                 typeof(IService),
                 null,
@@ -300,20 +300,20 @@ namespace ZenIocTests
         public void StaticRegisterConcreteType_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.Register<MyService>();
+            IocContainer.Register<MyService>();
 
             Assert.True(mock.ContainsKey(new Tuple<Type, string>(typeof(MyService), null)));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterConcreteType_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.Register<MyService>();
 
@@ -324,20 +324,20 @@ namespace ZenIocTests
         public void StaticRegisterConcreteType_RegistersAsMultiInstance()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.Register<MyService>();
+            IocContainer.Register<MyService>();
 
             Assert.Equal(LifeCycle.Transient, mock[new Tuple<Type, string>(typeof(MyService), null)].LifeCycle);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterConcreteType_RegistersAsMultiInstance()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.Register<MyService>();
 
@@ -350,20 +350,20 @@ namespace ZenIocTests
         public void StaticRegisterResolvedType_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.Register<IService, MyService>();
+            IocContainer.Register<IService, MyService>();
 
             Assert.True(mock.ContainsKey(new Tuple<Type, string>(typeof(IService), null)));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterResolvedType_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.Register<IService, MyService>();
 
@@ -374,20 +374,20 @@ namespace ZenIocTests
         public void StaticRegisterResolvedType_Default_RegistersAsMultiInstance()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.Register<IService, MyService>();
+            IocContainer.Register<IService, MyService>();
 
             Assert.Equal(LifeCycle.Transient, mock[new Tuple<Type, string>(typeof(IService), null)].LifeCycle);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterResolvedType_Default_RegistersAsMultiInstance()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.Register<IService, MyService>();
 
@@ -400,33 +400,33 @@ namespace ZenIocTests
         public void StaticRegisterConcreteTypeWithKey_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.Register<MyService>("test");
+            IocContainer.Register<MyService>("test");
 
             Assert.True(mock.ContainsKey(new Tuple<Type, string>(typeof(MyService), "test")));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void StaticRegisterWithCtorParametersWithKey_ResolvesWithSelectedCtor()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.Register<ClassWith3Ctors>("test",typeof(IService));
+            IocContainer.Register<ClassWith3Ctors>("test",typeof(IService));
 
-            Assert.Equal("(IService service)", DiContainer.Resolve<ClassWith3Ctors>("test").ConstructorUsed);
+            Assert.Equal("(IService service)", IocContainer.Resolve<ClassWith3Ctors>("test").ConstructorUsed);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterWithCtorParametersWithKey_ResolvesWithSelectedCtor()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using  var container = new DiContainer(mock, ContainerOptions.Default);
+            using  var container = new IocContainer(mock, ContainerOptions.Default);
             container.Register<ClassWith3Ctors>("test", typeof(IService));
 
             Assert.Equal("(IService service)", container.Resolve<ClassWith3Ctors>("test").ConstructorUsed);
@@ -436,7 +436,7 @@ namespace ZenIocTests
         public void RegisterConcreteTypeWithKey_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.Register<MyService>("test");
 
@@ -449,20 +449,20 @@ namespace ZenIocTests
         public void StaticRegisterResolvedTypeWithKey_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.Register<IService, MyService>("test");
+            IocContainer.Register<IService, MyService>("test");
 
             Assert.True(mock.ContainsKey(new Tuple<Type, string>(typeof(IService), "test")));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterResolvedTypeWithKey_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.Register<IService, MyService>("test");
 
@@ -473,13 +473,13 @@ namespace ZenIocTests
         public void StaticRegisterResolvedWithCtorParameters_ResolvesWithSelectedCtor()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.Register<IClassWith3Ctors, ClassWith3Ctors>(typeof(IService));
+            IocContainer.Register<IClassWith3Ctors, ClassWith3Ctors>(typeof(IService));
 
-            Assert.Equal("(IService service)", DiContainer.Resolve<IClassWith3Ctors>().ConstructorUsed);
+            Assert.Equal("(IService service)", IocContainer.Resolve<IClassWith3Ctors>().ConstructorUsed);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
@@ -488,7 +488,7 @@ namespace ZenIocTests
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
 
 
-            using  var container = new DiContainer(mock, ContainerOptions.Default);
+            using  var container = new IocContainer(mock, ContainerOptions.Default);
             container.Register<IClassWith3Ctors, ClassWith3Ctors>(typeof(IService));
 
             Assert.Equal("(IService service)", container.Resolve<IClassWith3Ctors>().ConstructorUsed);
@@ -498,20 +498,20 @@ namespace ZenIocTests
         public void StaticRegisterResolvedWithCtorParametersWithKey_ResolvesWithSelectedCtor()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.Register<IClassWith3Ctors, ClassWith3Ctors>("test",typeof(IService));
+            IocContainer.Register<IClassWith3Ctors, ClassWith3Ctors>("test",typeof(IService));
 
-            Assert.Equal("(IService service)", DiContainer.Resolve<IClassWith3Ctors>("test").ConstructorUsed);
+            Assert.Equal("(IService service)", IocContainer.Resolve<IClassWith3Ctors>("test").ConstructorUsed);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterResolvedWithCtorParametersWithKey_ResolvesWithSelectedCtor()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.Register<IClassWith3Ctors, ClassWith3Ctors>("test", typeof(IService));
 
@@ -525,20 +525,20 @@ namespace ZenIocTests
         public void StaticRegisterInstance_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.RegisterInstance(new MyService());
+            IocContainer.RegisterInstance(new MyService());
 
             Assert.True(mock.ContainsKey(new Tuple<Type, string>(typeof(MyService), null)));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterInstance_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.RegisterInstance(new MyService());
 
@@ -549,20 +549,20 @@ namespace ZenIocTests
         public void StaticRegisterInstanceWithResolvedType_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.RegisterInstance<IService>(new MyService());
+            IocContainer.RegisterInstance<IService>(new MyService());
 
             Assert.True(mock.ContainsKey(new Tuple<Type, string>(typeof(IService), null)));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterInstanceWithResolvedType_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.RegisterInstance<IService>(new MyService());
 
@@ -573,20 +573,20 @@ namespace ZenIocTests
         public void StaticRegisterInstanceWithKey_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.RegisterInstance(new MyService(), "test");
+            IocContainer.RegisterInstance(new MyService(), "test");
 
             Assert.True(mock.ContainsKey(new Tuple<Type, string>(typeof(MyService), "test")));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterInstanceWithKey_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.RegisterInstance(new MyService(), "test");
 
@@ -597,20 +597,20 @@ namespace ZenIocTests
         public void StaticRegisterInstanceWithResolvedTypeWithKey_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.RegisterInstance<IService>(new MyService(), "test");
+            IocContainer.RegisterInstance<IService>(new MyService(), "test");
 
             Assert.True(mock.ContainsKey(new Tuple<Type, string>(typeof(IService), "test")));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterInstanceWithResolvedTypeWithKey_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.RegisterInstance<IService>(new MyService(), "test");
 
@@ -626,20 +626,20 @@ namespace ZenIocTests
         public void StaticRegisterExpression_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.RegisterExplicit<MyService,MyService>(c => new MyService());
+            IocContainer.RegisterExplicit<MyService,MyService>(c => new MyService());
 
             Assert.True(mock.ContainsKey(new Tuple<Type, string>(typeof(MyService), null)));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterExpression_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.RegisterExplicit<MyService,MyService>(c => new MyService());
 
@@ -650,20 +650,20 @@ namespace ZenIocTests
         public void StaticRegisterExpressionWithResolvedType_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.RegisterExplicit<IService,MyService>(c => new MyService());
+            IocContainer.RegisterExplicit<IService,MyService>(c => new MyService());
 
             Assert.True(mock.ContainsKey(new Tuple<Type, string>(typeof(IService), null)));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterExpressionWithResolvedType_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.RegisterExplicit<IService,MyService>(c => new MyService());
 
@@ -674,20 +674,20 @@ namespace ZenIocTests
         public void StaticRegisterExpressionWithKey_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.RegisterExplicit<MyService,MyService>(c => new MyService(), "test");
+            IocContainer.RegisterExplicit<MyService,MyService>(c => new MyService(), "test");
 
             Assert.True(mock.ContainsKey(new Tuple<Type, string>(typeof(MyService), "test")));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterExpressionWithKey_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.RegisterExplicit<MyService,MyService>(c => new MyService(), "test");
 
@@ -698,20 +698,20 @@ namespace ZenIocTests
         public void StaticRegisterExpressionWithResolvedTypeWithKey_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.RegisterExplicit<IService,MyService>(c => new MyService(), "test");
+            IocContainer.RegisterExplicit<IService,MyService>(c => new MyService(), "test");
 
             Assert.True(mock.ContainsKey(new Tuple<Type, string>(typeof(IService), "test")));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterExpressionWithResolvedTypeWithKey_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.RegisterExplicit<IService,MyService>(c => new MyService(), "test");
 
@@ -725,20 +725,20 @@ namespace ZenIocTests
         public void StaticRegisterType_Defaults_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.RegisterType(typeof(MyService));
+            IocContainer.RegisterType(typeof(MyService));
 
             Assert.True(mock.ContainsKey(new Tuple<Type, string>(typeof(MyService), null)));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterType_Defaults_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.RegisterType(typeof(MyService));
 
@@ -749,20 +749,20 @@ namespace ZenIocTests
         public void StaticRegisterType_ResolvedType_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.RegisterType(typeof(MyService), typeof(IService));
+            IocContainer.RegisterType(typeof(MyService), typeof(IService));
 
             Assert.True(mock.ContainsKey(new Tuple<Type, string>(typeof(IService), null)));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterType_ResolvedType_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.RegisterType(typeof(MyService), typeof(IService));
 
@@ -773,20 +773,20 @@ namespace ZenIocTests
         public void StaticRegisterType_ResolvedTypeWithKey_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.RegisterType(typeof(MyService), typeof(IService), "test");
+            IocContainer.RegisterType(typeof(MyService), typeof(IService), "test");
 
             Assert.True(mock.ContainsKey(new Tuple<Type, string>(typeof(IService), "test")));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterType_ResolvedTypeWithKey_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.RegisterType(typeof(MyService), typeof(IService), "test");
 
@@ -797,20 +797,20 @@ namespace ZenIocTests
         public void StaticRegisterType_WithConstructorParams_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.RegisterType(typeof(ClassWith3Ctors), null, null, typeof(IService), typeof(ConcreteOnly));
+            IocContainer.RegisterType(typeof(ClassWith3Ctors), null, null, typeof(IService), typeof(ConcreteOnly));
 
             Assert.True(mock.ContainsKey(new Tuple<Type, string>(typeof(ClassWith3Ctors), null)));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterType_WithConstructorParams_RegistersWithExpectedKey()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.RegisterType(typeof(ClassWith3Ctors), null, null, typeof(IService), typeof(ConcreteOnly));
 
@@ -822,17 +822,17 @@ namespace ZenIocTests
         [Fact]
         public void RegisterTypesOf_NotInterfaceAbstract_Throws()
         {
-            Assert.Throws<RegisterException>(() => DiContainer.RegisterTypesOf<MyService>());
+            Assert.Throws<RegisterException>(() => IocContainer.RegisterTypesOf<MyService>());
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterTypesOf_Abstract_Singleton()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
-          DiContainer.RegisterTypesOf<ClassThatsAbstract>(LifeCycle.Singleton);
+            IocContainer.SetContainer(mock);
+          IocContainer.RegisterTypesOf<ClassThatsAbstract>(LifeCycle.Singleton);
 
             Assert.Equal(3, mock.Count);
 
@@ -854,15 +854,15 @@ namespace ZenIocTests
                 && r.Value.LifeCycle.Equals(LifeCycle.Singleton)
                 );
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterTypesOf_Interface_Singleton()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
-            DiContainer.RegisterTypesOf<IServiceWithTwoImplementations>(LifeCycle.Singleton);
+            IocContainer.SetContainer(mock);
+            IocContainer.RegisterTypesOf<IServiceWithTwoImplementations>(LifeCycle.Singleton);
 
             Assert.Equal(3, mock.Count);
 
@@ -884,15 +884,15 @@ namespace ZenIocTests
                 && r.Value.LifeCycle.Equals(LifeCycle.Singleton)
                 );
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterTypesOf_Interface()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
-            DiContainer.RegisterTypesOf<IServiceWithTwoImplementations>();
+            IocContainer.SetContainer(mock);
+            IocContainer.RegisterTypesOf<IServiceWithTwoImplementations>();
 
             Assert.Equal(3, mock.Count);
 
@@ -914,50 +914,50 @@ namespace ZenIocTests
                 && r.Value.LifeCycle.Equals(LifeCycle.Transient)
                 );
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void ResolveIEnumerableInterface_NotRegistered()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
             
-            var enumerable = DiContainer.Resolve<IEnumerable<IServiceWithTwoImplementations>>();
+            var enumerable = IocContainer.Resolve<IEnumerable<IServiceWithTwoImplementations>>();
 
             Assert.Equal(2, enumerable.Count());
             Assert.Contains(enumerable, t => t.GetType().Equals(typeof(ServiceTwo)));
             Assert.Contains(enumerable, t => t.GetType().Equals(typeof(MockServiceTwo)));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void ResolveIEnumerableInterface_NotRegistered_SomeMembersRegistered()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
-            DiContainer.Register<IServiceWithTwoImplementations, MockServiceTwo>(nameof(MockServiceTwo)).SingleInstance();
+            IocContainer.SetContainer(mock);
+            IocContainer.Register<IServiceWithTwoImplementations, MockServiceTwo>(nameof(MockServiceTwo)).SingleInstance();
 
             Assert.Throws<RegisterException>(()=>
-                DiContainer.Resolve<IEnumerable<IServiceWithTwoImplementations>>());
+                IocContainer.Resolve<IEnumerable<IServiceWithTwoImplementations>>());
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void ResolveIEnumerableAbstract_NotRegistered()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            var enumerable = DiContainer.Resolve<IEnumerable<ClassThatsAbstract>>();
+            var enumerable = IocContainer.Resolve<IEnumerable<ClassThatsAbstract>>();
 
             Assert.Equal(2, enumerable.Count());
             Assert.Contains(enumerable, t => t.GetType().Equals(typeof(ClassInheritsAbstract1)));
             Assert.Contains(enumerable, t => t.GetType().Equals(typeof(ClassInheritsAbstract2)));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
 
@@ -968,22 +968,22 @@ namespace ZenIocTests
         public void StaticRegisterConcreteType_OptionsSingleInstance_RegistersAsSingleInstance()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer
+            IocContainer
                 .Register<MyService>()
                 .SingleInstance();
 
             Assert.Equal(LifeCycle.Singleton, mock[new Tuple<Type, string>(typeof(MyService), null)].LifeCycle);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterConcreteType_OptionsSingleInstance_RegistersAsSingleInstance()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container
                 .Register<MyService>()
@@ -996,21 +996,21 @@ namespace ZenIocTests
         public void StaticRegisterResolvedType_RegistersAsMultiInstance()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer
+            IocContainer
                 .Register<IService, MyService>();
 
             Assert.Equal(LifeCycle.Transient, mock[new Tuple<Type, string>(typeof(IService), null)].LifeCycle);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterResolvedType_RegistersAsMultiInstance()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container
                 .Register<IService, MyService>();
@@ -1021,21 +1021,21 @@ namespace ZenIocTests
         [Fact]
         public void StaticRegisterConcreteType_UsingConstructorOption_ResolvesSpecifiedConstructor()
         {
-            DiContainer.Register<IService, MyService>();
+            IocContainer.Register<IService, MyService>();
 
-            DiContainer
+            IocContainer
                 .Register<ClassWith3Ctors>(typeof(IService));
 
-            var resolved = DiContainer.Resolve<ClassWith3Ctors>();
+            var resolved = IocContainer.Resolve<ClassWith3Ctors>();
             Assert.Equal("(IService service)", resolved.ConstructorUsed);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void RegisterConcreteType__UsingConstructorOption_ResolvesSpecifiedConstructor()
         {
-            using var container = new DiContainer();
+            using var container = new IocContainer();
             container.Register<IService, MyService>();
 
             container
@@ -1049,30 +1049,30 @@ namespace ZenIocTests
         public void StaticRegisterConcreteType_UsingConstructorOption_WrongCtor_ThrowsRegistrationException()
         {
             Assert.Throws<RegisterException>(() =>
-                DiContainer
+                IocContainer
                     .Register<ClassWith3Ctors>(typeof(ConcreteOnly)));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
 
         [Fact]
         public void StaticRegisterConcreteType_UsingConstructorOption_ResolvesInternalConstructor()
         {
-            DiContainer
+            IocContainer
                 .Register<ClassWithInternalConstructor>(typeof(ConcreteOnly));
 
-            var resolved = DiContainer.Resolve<ClassWithInternalConstructor>();
+            var resolved = IocContainer.Resolve<ClassWithInternalConstructor>();
             Assert.Equal("internal", resolved.ConstructorUsed);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void Compile_SetsActivationExpression()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using  var container = new DiContainer(mock, ContainerOptions.Default);
+            using  var container = new IocContainer(mock, ContainerOptions.Default);
             container.Register<ClassWith3Ctors>("test", typeof(IService));
 
             mock.TryGetValue(new Tuple<Type, string>(typeof(ClassWith3Ctors), "test"), out MetaObject metaObject);
@@ -1147,14 +1147,14 @@ namespace ZenIocTests
         public void GetMetaObject_IsGenericType_NotConstructedGeneric_Throws()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer();
+            using var container = new IocContainer();
             Assert.Throws<ResolveException>(()=>container.GetMetaObject(mock, typeof(ClassThatsGeneric<>), null));
         }
 
         [Fact]
         public void Resolve_IsConstructedGeneric_NotRegistered()
         {
-            using var container = new DiContainer();
+            using var container = new IocContainer();
 
             Assert.IsType<ClassThatsGeneric<MyService>>(container.Resolve<ClassThatsGeneric<MyService>>());
         }
@@ -1164,7 +1164,7 @@ namespace ZenIocTests
         public void GetMetaObject_UnregisteredInterface_Gt1Implementations_Throws()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer();
+            using var container = new IocContainer();
             Assert.Throws<ResolveException>(() => container.GetMetaObject(mock, typeof(IServiceWithTwoImplementations), null));
         }
 
@@ -1172,7 +1172,7 @@ namespace ZenIocTests
         public void GetMetaObject_UnregisteredInterface_NoImplementations_Throws()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer();
+            using var container = new IocContainer();
             Assert.Throws<ResolveException>(() => container.GetMetaObject(mock, typeof(IServiceWithNoImplementations), null));
         }
 
@@ -1180,7 +1180,7 @@ namespace ZenIocTests
         public void GetEnumerableException_Nothing_Registered_Throws()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer();
+            using var container = new IocContainer();
             Assert.Throws<ResolveException>(()=>container.GetEnumerableExpression(mock, typeof(IEnumerable<IService>)));
             
         }
@@ -1189,7 +1189,7 @@ namespace ZenIocTests
         public void MakeNewExpression_ConstructorCacheNull_Throws()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer();
+            using var container = new IocContainer();
             var metaObject = new MetaObject(new MyService());
             Assert.Null(metaObject.ConstructorCache);
             Assert.Throws<Exception>(() => container.MakeNewExpression(mock, metaObject));
@@ -1200,17 +1200,17 @@ namespace ZenIocTests
         [Fact]
         public void StaticResolve_Unregistered_Works()
         {
-            var obj = DiContainer.Resolve<ClassThatsResolvableWithoutRegistering>();
+            var obj = IocContainer.Resolve<ClassThatsResolvableWithoutRegistering>();
 
             Assert.IsType<ClassThatsResolvableWithoutRegistering>(obj);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void Resolve_Unregistered_Works()
         {
-            using var container = new DiContainer(ContainerOptions.Default);
+            using var container = new IocContainer(ContainerOptions.Default);
             var obj = container.Resolve<ClassThatsResolvableWithoutRegistering>();
 
             Assert.IsType<ClassThatsResolvableWithoutRegistering>(obj);
@@ -1220,40 +1220,40 @@ namespace ZenIocTests
         [Fact]
         public void StaticResolve_IsStrictModeTrue_Unregistered_Throws()
         {
-            DiContainer.Initialize(o => o.TryResolveUnregistered = false);
+            IocContainer.Initialize(o => o.TryResolveUnregistered = false);
             Assert.Throws<ResolveException>(
-                () => DiContainer.Resolve<ClassThatsResolvableWithoutRegistering>());
+                () => IocContainer.Resolve<ClassThatsResolvableWithoutRegistering>());
         }
 
         [Fact]
         public void StaticResolve_KeyedDependency_Works()
         {
-            DiContainer.Register<IService, MyService>("test");
-            DiContainer.Register<ClassWithKeyedDependency>();
-            var obj = DiContainer.Resolve<ClassWithKeyedDependency>();
+            IocContainer.Register<IService, MyService>("test");
+            IocContainer.Register<ClassWithKeyedDependency>();
+            var obj = IocContainer.Resolve<ClassWithKeyedDependency>();
 
             Assert.IsType<ClassWithKeyedDependency>(obj);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void StaticResolve_InstanceRegistered_ReturnsInstance()
         {
             var instance = new MyService();
-            DiContainer.RegisterInstance(instance);
-            var resolved = DiContainer.Resolve<MyService>();
+            IocContainer.RegisterInstance(instance);
+            var resolved = IocContainer.Resolve<MyService>();
             Assert.Equal(instance, resolved); //exactly same object returned
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void StaticResolve_InterfaceThatsNotRegistered_Works()
         {
-            Assert.IsAssignableFrom<IService>(DiContainer.Resolve<IService>());
+            Assert.IsAssignableFrom<IService>(IocContainer.Resolve<IService>());
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
 
@@ -1262,7 +1262,7 @@ namespace ZenIocTests
         //public void StaticResolve_UnregisteredUnresolvable2_Throws()
         //{
         //    Assert.Throws<ResolveException>(
-        //        () => DiContainer.Resolve<ClassThatsUnresolvable>());
+        //        () => IocContainer.Resolve<ClassThatsUnresolvable>());
         //}
 
         //Now have explicit child container
@@ -1270,40 +1270,40 @@ namespace ZenIocTests
         //public void ResolveFromContainerInstance_RegisteredInStaticContainer_ResolvesFromStaticContainer()
         //{
         //    var registeredObject = new ClassThatHasToBeRegistered(3);
-        //    DiContainer.RegisterInstance(registeredObject);
+        //    IocContainer.RegisterInstance(registeredObject);
 
-        //    using var container = new DiContainer();
+        //    using var container = new IocContainer();
         //    var resolved = container.Resolve<ClassThatHasToBeRegistered>();
 
         //    Assert.Equal(registeredObject, resolved);
 
-        //    DiContainer.ResetContainer();
+        //    IocContainer.ResetContainer();
         //}
 
 
         [Fact]
         public void StaticResolve_Interface_ThrowsResolutionException()
         {
-            Assert.Throws<RegisterException>(() => DiContainer.Register<IService>());
-            DiContainer.ResetContainer();
+            Assert.Throws<RegisterException>(() => IocContainer.Register<IService>());
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void StaticResolveWithKey_InstanceRegistered_ReturnsInstance()
         {
             var instance = new MyService();
-            DiContainer.RegisterInstance(instance, "test");
-            var resolved = DiContainer.Resolve<MyService>("test");
+            IocContainer.RegisterInstance(instance, "test");
+            var resolved = IocContainer.Resolve<MyService>("test");
             Assert.Equal(instance, resolved); //exactly same object returned
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void ResolveWithKey_InstanceRegistered_ReturnsInstance()
         {
             var instance = new MyService();
-            using var container = new DiContainer();
+            using var container = new IocContainer();
             container.RegisterInstance(instance, "test");
             var resolved = container.Resolve<MyService>("test");
             Assert.Equal(instance, resolved); //exactly same object returned
@@ -1313,61 +1313,61 @@ namespace ZenIocTests
         public void StaticResolveofSingleInstance_SecondResolve_ReturnsSavedInstance()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.Register<IService, MyService>().SingleInstance();
+            IocContainer.Register<IService, MyService>().SingleInstance();
 
             Assert.Null(mock[new Tuple<Type, string>(typeof(IService), null)].Instance);
 
             //first resolve
-            var first = DiContainer.Resolve<IService>();
+            var first = IocContainer.Resolve<IService>();
 
             Assert.NotNull(mock[new Tuple<Type, string>(typeof(IService), null)].Instance);
 
             //second resolve
-            var second = DiContainer.Resolve<IService>();
+            var second = IocContainer.Resolve<IService>();
 
             Assert.Equal(first, second);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void StaticResolveofSingleInstance_SecondResolve_IsSameObject()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
             var singleton = new MyService();
-            DiContainer.RegisterInstance<IService>(singleton);
+            IocContainer.RegisterInstance<IService>(singleton);
 
             //first resolve
-            Assert.Equal(singleton, DiContainer.Resolve<IService>());
+            Assert.Equal(singleton, IocContainer.Resolve<IService>());
 
             //second resolve
             //first resolve
-            Assert.Equal(singleton, DiContainer.Resolve<IService>());
+            Assert.Equal(singleton, IocContainer.Resolve<IService>());
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         #region Resolve from RegisterExpression
         [Fact]
         public void StaticResolve_Expression_ReturnsInstance()
         {
-            DiContainer.Register<IService, MyService>();
-            DiContainer.RegisterExplicit<ClassWith3Ctors,ClassWith3Ctors>(c => new ClassWith3Ctors(DiContainer.Resolve<IService>()));
+            IocContainer.Register<IService, MyService>();
+            IocContainer.RegisterExplicit<ClassWith3Ctors,ClassWith3Ctors>(c => new ClassWith3Ctors(IocContainer.Resolve<IService>()));
 
-            var resolved = DiContainer.Resolve<ClassWith3Ctors>();
+            var resolved = IocContainer.Resolve<ClassWith3Ctors>();
             Assert.IsType<ClassWith3Ctors>(resolved);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void Resolve_Expression_ReturnsInstance()
         {
-            using var container = new DiContainer();
+            using var container = new IocContainer();
             container.Register<IService, MyService>();
             container.RegisterExplicit<ClassWith3Ctors,ClassWith3Ctors>(c => new ClassWith3Ctors(c.Resolve<IService>()));
 
@@ -1378,19 +1378,19 @@ namespace ZenIocTests
         [Fact]
         public void StaticResolve_ExpressionWithResolveType_ReturnsInstance()
         {
-            DiContainer.Register<IService, MyService>();
-            DiContainer.RegisterExplicit<IClassWith3Ctors,ClassWith3Ctors>(c => new ClassWith3Ctors(DiContainer.Resolve<IService>()));
+            IocContainer.Register<IService, MyService>();
+            IocContainer.RegisterExplicit<IClassWith3Ctors,ClassWith3Ctors>(c => new ClassWith3Ctors(IocContainer.Resolve<IService>()));
 
-            var resolved = DiContainer.Resolve<IClassWith3Ctors>();
+            var resolved = IocContainer.Resolve<IClassWith3Ctors>();
             Assert.IsType<ClassWith3Ctors>(resolved);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void Resolve_ExpressionWithResolveType_ReturnsInstance()
         {
-            using var container = new DiContainer();
+            using var container = new IocContainer();
             container.Register<IService, MyService>();
             container.RegisterExplicit<IClassWith3Ctors,ClassWith3Ctors>(c => new ClassWith3Ctors(c.Resolve<IService>()));
 
@@ -1402,19 +1402,19 @@ namespace ZenIocTests
         [Fact]
         public void StaticResolve_ExpressionWithKey_ReturnsInstance()
         {
-            DiContainer.Register<IService, MyService>();
-            DiContainer.RegisterExplicit<ClassWith3Ctors,ClassWith3Ctors>(c => new ClassWith3Ctors(DiContainer.Resolve<IService>()), "test");
+            IocContainer.Register<IService, MyService>();
+            IocContainer.RegisterExplicit<ClassWith3Ctors,ClassWith3Ctors>(c => new ClassWith3Ctors(IocContainer.Resolve<IService>()), "test");
 
-            var resolved = DiContainer.Resolve<ClassWith3Ctors>("test");
+            var resolved = IocContainer.Resolve<ClassWith3Ctors>("test");
             Assert.IsType<ClassWith3Ctors>(resolved);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void Resolve_ExpressionWithKey_ReturnsInstance()
         {
-            using var container = new DiContainer();
+            using var container = new IocContainer();
             container.Register<IService, MyService>();
             container.RegisterExplicit<ClassWith3Ctors,ClassWith3Ctors>(c => new ClassWith3Ctors(c.Resolve<IService>()), "test");
 
@@ -1425,19 +1425,19 @@ namespace ZenIocTests
         [Fact]
         public void StaticResolve_ExpressionWithResolveTypeWithKey_ReturnsInstance()
         {
-            DiContainer.Register<IService, MyService>();
-            DiContainer.RegisterExplicit<IClassWith3Ctors,ClassWith3Ctors>(c => new ClassWith3Ctors(DiContainer.Resolve<IService>()), "test");
+            IocContainer.Register<IService, MyService>();
+            IocContainer.RegisterExplicit<IClassWith3Ctors,ClassWith3Ctors>(c => new ClassWith3Ctors(IocContainer.Resolve<IService>()), "test");
 
-            var resolved = DiContainer.Resolve<IClassWith3Ctors>("test");
+            var resolved = IocContainer.Resolve<IClassWith3Ctors>("test");
             Assert.IsType<ClassWith3Ctors>(resolved);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void Resolve_ExpressionWithResolveTypeWithKey_ReturnsInstance()
         {
-            using var container = new DiContainer();
+            using var container = new IocContainer();
             container.Register<IService, MyService>();
             container.RegisterExplicit<IClassWith3Ctors,ClassWith3Ctors>(c => new ClassWith3Ctors(c.Resolve<IService>()), "test");
 
@@ -1451,21 +1451,21 @@ namespace ZenIocTests
         [Fact]
         public void StaticResolveType_InstanceRegistered_ReturnsInstance()
         {
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
 
             var instance = new MyService();
-            DiContainer.RegisterInstance(instance);
-            var resolved = DiContainer.Resolve(typeof(MyService));
+            IocContainer.RegisterInstance(instance);
+            var resolved = IocContainer.Resolve(typeof(MyService));
             Assert.Equal(instance, resolved); //exactly same object returned
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void ResolveType_InstanceRegistered_ReturnsInstance()
         {
             var instance = new MyService();
-            using var container = new DiContainer();
+            using var container = new IocContainer();
             container.RegisterInstance(instance);
             var resolved = container.Resolve(typeof(MyService));
             Assert.Equal(instance, resolved); //exactly same object returned
@@ -1475,18 +1475,18 @@ namespace ZenIocTests
         public void StaticResolveTypeWithKey_InstanceRegistered_ReturnsInstance()
         {
             var instance = new MyService();
-            DiContainer.RegisterInstance(instance, "test");
-            var resolved = DiContainer.Resolve(typeof(MyService), "test");
+            IocContainer.RegisterInstance(instance, "test");
+            var resolved = IocContainer.Resolve(typeof(MyService), "test");
             Assert.Equal(instance, resolved); //exactly same object returned
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void ResolveTypeWithKey_InstanceRegistered_ReturnsInstance()
         {
             var instance = new MyService();
-            using var container = new DiContainer();
+            using var container = new IocContainer();
             container.RegisterInstance(instance, "test");
             var resolved = container.Resolve(typeof(MyService), "test");
             Assert.Equal(instance, resolved); //exactly same object returned
@@ -1500,43 +1500,43 @@ namespace ZenIocTests
         [Fact]
         public void StaticUnregister_NotRegistered_ThrowsResolutionExceptoin()
         {
-            Assert.Throws<ResolveException>(() => DiContainer.Unregister<ConcreteOnly>());
+            Assert.Throws<ResolveException>(() => IocContainer.Unregister<ConcreteOnly>());
         }
 
         [Fact]
         public void StaticUnregister_ExceptionWhileDisposing_ThrowsException()
         {
             //Ensure MetaObject.Instance is set
-            DiContainer.Register<ClassThatThrowsOnDisposed>().SingleInstance();
+            IocContainer.Register<ClassThatThrowsOnDisposed>().SingleInstance();
 
-            DiContainer.Resolve<ClassThatThrowsOnDisposed>();
+            IocContainer.Resolve<ClassThatThrowsOnDisposed>();
 
-            Assert.Throws<Exception>(() => DiContainer.Unregister<ClassThatThrowsOnDisposed>());
+            Assert.Throws<Exception>(() => IocContainer.Unregister<ClassThatThrowsOnDisposed>());
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void StaticUnregister_Registered_IsRemoved()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.Register<ConcreteOnly>();
+            IocContainer.Register<ConcreteOnly>();
 
             Assert.NotEmpty(mock);
 
-            DiContainer.Unregister<ConcreteOnly>();
+            IocContainer.Unregister<ConcreteOnly>();
 
             Assert.Empty(mock);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
         [Fact]
         public void Unregister_Registered_IsRemoved()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.Register<ConcreteOnly>();
 
@@ -1550,23 +1550,23 @@ namespace ZenIocTests
         public void StaticUnregisterWithKey_Registered_IsRemoved()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.Register<ConcreteOnly>("test");
+            IocContainer.Register<ConcreteOnly>("test");
 
             Assert.NotEmpty(mock);
 
-            DiContainer.Unregister<ConcreteOnly>("test");
+            IocContainer.Unregister<ConcreteOnly>("test");
 
             Assert.Empty(mock);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
         [Fact]
         public void UnregisterWithKey_Registered_IsRemoved()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.Register<ConcreteOnly>("test");
 
@@ -1580,16 +1580,16 @@ namespace ZenIocTests
         public void StaticUnregisterWithKey_NotRegistered_ThrowsResolutionException()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.Register<ConcreteOnly>("test");
+            IocContainer.Register<ConcreteOnly>("test");
 
             Assert.NotEmpty(mock);
 
             Assert.Throws<ResolveException>(
-                () => DiContainer.Unregister<ConcreteOnly>("wrongKey"));
+                () => IocContainer.Unregister<ConcreteOnly>("wrongKey"));
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
@@ -1597,40 +1597,40 @@ namespace ZenIocTests
         {
             bool wasDisposedExplicitly = false;
             var disposable = new ClassThatsDisposable(() => wasDisposedExplicitly = true, () => { });
-            DiContainer.RegisterInstance<IClassThatsDisposable>(disposable);
-            DiContainer.Resolve<IClassThatsDisposable>();
+            IocContainer.RegisterInstance<IClassThatsDisposable>(disposable);
+            IocContainer.Resolve<IClassThatsDisposable>();
 
-            DiContainer.Unregister<IClassThatsDisposable>();
+            IocContainer.Unregister<IClassThatsDisposable>();
 
             Assert.True(wasDisposedExplicitly);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void StaticUnregisterAll()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            DiContainer.SetContainer(mock);
+            IocContainer.SetContainer(mock);
 
-            DiContainer.Register<MyService>();
-            DiContainer.Register<ConcreteOnly>();
-            DiContainer.Register<ClassWith3Ctors>();
+            IocContainer.Register<MyService>();
+            IocContainer.Register<ConcreteOnly>();
+            IocContainer.Register<ClassWith3Ctors>();
 
             Assert.Equal(3, mock.Count);
 
-            DiContainer.UnregisterAll();
+            IocContainer.UnregisterAll();
 
             Assert.Empty(mock);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
         [Fact]
         public void UnregisterAll()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.Register<MyService>();
             container.Register<ConcreteOnly>();
@@ -1647,7 +1647,7 @@ namespace ZenIocTests
         public void Dispose()
         {
             var mock = new ConcurrentDictionary<Tuple<Type, string>, MetaObject>();
-            using var container = new DiContainer(mock, ContainerOptions.Default);
+            using var container = new IocContainer(mock, ContainerOptions.Default);
 
             container.Register<MyService>();
             container.Register<ConcreteOnly>();
@@ -1667,38 +1667,38 @@ namespace ZenIocTests
         [Fact]
         public void NewChildContainer_CreatesNewContainer()
         {
-            using  var container = new DiContainer();
+            using  var container = new IocContainer();
             var child = container.NewChildContainer();
 
-            Assert.IsAssignableFrom<IDiContainer>(child);
+            Assert.IsAssignableFrom<IIocContainer>(child);
 
             //Repeat for Static implementation
-            child = DiContainer.NewChildContainer();
+            child = IocContainer.NewChildContainer();
 
-            Assert.IsAssignableFrom<IDiContainer>(child);
+            Assert.IsAssignableFrom<IIocContainer>(child);
         }
 
         [Fact]
         public void NewChildContainer_SetsNewContainersParent()
         {
-            using  var container = new DiContainer();
+            using  var container = new IocContainer();
             var child = container.NewChildContainer();
 
             Assert.Equal(container, child.GetParent());
 
             //Repeat for Static implementation
-            child = DiContainer.NewChildContainer();
-            Assert.Equal(DiContainer.Instance, child.GetParent());
+            child = IocContainer.NewChildContainer();
+            Assert.Equal(IocContainer.Instance, child.GetParent());
         }
 
 
         [Fact]
         public void Parent_ReturnsParentContainer()
         {
-            using  var container = new DiContainer();
+            using  var container = new IocContainer();
 
             //Cast in order to test IDicontainerExtensions
-            DiContainer child = container.NewChildContainer() as DiContainer;
+            IocContainer child = container.NewChildContainer() as IocContainer;
 
             Assert.Equal(container, child.GetParent());
         }
@@ -1706,16 +1706,16 @@ namespace ZenIocTests
         [Fact]
         public void NewChildContainer_SetsChild()
         {
-            using  var container = new DiContainer();
+            using  var container = new IocContainer();
             var child = container.NewChildContainer();
 
             Assert.Equal(child, container.GetChildren()[0]);
             
             //Repeat for Static implementation
-            child = DiContainer.NewChildContainer();
-            Assert.Equal(child, DiContainer.GetChildren()[0]);
+            child = IocContainer.NewChildContainer();
+            Assert.Equal(child, IocContainer.GetChildren()[0]);
 
-            DiContainer.Initialize(ContainerOptions.Default); //Reset options to default
+            IocContainer.Initialize(ContainerOptions.Default); //Reset options to default
         }
 
         [Fact]
@@ -1725,10 +1725,10 @@ namespace ZenIocTests
             {
                 TryResolveUnregistered = false
             };
-            using  var container = new DiContainer(options);
+            using  var container = new IocContainer(options);
             var child = container.NewChildContainer();
 
-            Assert.False(DiContainer.options.TryResolveUnregistered);
+            Assert.False(IocContainer.options.TryResolveUnregistered);
         }
 
 
@@ -1738,20 +1738,20 @@ namespace ZenIocTests
         [Fact]
         public void GetContainer_ReturnsNamedContainer()
         {
-            using var mainContainer = new DiContainer();
-            using var namedContainer = new DiContainer("namedContainer");
+            using var mainContainer = new IocContainer();
+            using var namedContainer = new IocContainer("namedContainer");
 
             Assert.Equal(namedContainer, mainContainer.GetContainer("namedContainer"));
 
             //Static implementation
-            Assert.Equal(namedContainer, DiContainer.GetContainer("namedContainer"));
+            Assert.Equal(namedContainer, IocContainer.GetContainer("namedContainer"));
         }
 
         [Fact]
         public void GetContainer_NameWrong_Throws()
         {
-            using var mainContainer = new DiContainer();
-            using var namedContainer = new DiContainer("namedContainer");
+            using var mainContainer = new IocContainer();
+            using var namedContainer = new IocContainer("namedContainer");
 
             Assert.Throws<KeyNotFoundException>(()=> mainContainer.GetContainer("wrongName"));
         }
@@ -1760,20 +1760,20 @@ namespace ZenIocTests
         [Fact]
         public void SetName_RemovesOldNameFromRegister()
         {
-            using  var container = new DiContainer("OldName")
+            using  var container = new IocContainer("OldName")
             {
                 Name = "NewName"
             };
             
-            Assert.Equal(2, DiContainer.containers.Count);
-            Assert.False(DiContainer.containers.TryGetValue("OldName", out _));
+            Assert.Equal(2, IocContainer.containers.Count);
+            Assert.False(IocContainer.containers.TryGetValue("OldName", out _));
         }
 
         [Fact]
         public void SetName_AlreadyExists_Throws()
         {
-            using var container = new DiContainer("namedContainer");
-            using var container2 = new DiContainer();
+            using var container = new IocContainer("namedContainer");
+            using var container2 = new IocContainer();
             Assert.Throws<ArgumentException>(()=>container2.Name = "namedContainer");
         }
 
@@ -1783,27 +1783,27 @@ namespace ZenIocTests
         [Fact]
         public void StaticRegisterConcreteType_Duplicate_ThrowsRegistrationException()
         {
-            DiContainer.Register<MyService>();
-            Assert.Throws<RegisterException>(() => DiContainer.Register<MyService>());
+            IocContainer.Register<MyService>();
+            Assert.Throws<RegisterException>(() => IocContainer.Register<MyService>());
         }
 
         [Fact]
         public void StaticRegisterConcreteTypeWithKey_Duplicate_ThrowsRegistrationException()
         {
-            DiContainer.Register<MyService>("test");
-            Assert.Throws<RegisterException>(() => DiContainer.Register<MyService>("test"));
+            IocContainer.Register<MyService>("test");
+            Assert.Throws<RegisterException>(() => IocContainer.Register<MyService>("test"));
         }
 
         [Fact]
         public void StaticResolveClassWithInternalConstructor_ResolvesPublicEvenThoughInternalIsGreediest()
         {
-            DiContainer
+            IocContainer
                 .Register<ClassWithInternalConstructor>();
 
-            var resolved = DiContainer.Resolve<ClassWithInternalConstructor>();
+            var resolved = IocContainer.Resolve<ClassWithInternalConstructor>();
             Assert.Equal("public", resolved.ConstructorUsed);
 
-            DiContainer.ResetContainer();
+            IocContainer.ResetContainer();
         }
 
 
