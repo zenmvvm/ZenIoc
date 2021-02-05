@@ -3,8 +3,8 @@
   <PropertyGroup>
 	<!-- General -->
     <AssemblyName>ZenIoc</AssemblyName>
-    <Description></Description>
-    <Copyright>Copyright 2020 Guy Antoine</Copyright>
+    <Description>Fast Friendly Dependency Injection</Description>
+    <Copyright>Copyright 2020 ZenMvvm</Copyright>
     <Authors>Guy Antoine and contributors</Authors>
     <NeutralLanguage>en-GB</NeutralLanguage>
 
@@ -13,7 +13,7 @@
 
     <!-- NuGet settings -->
     <PackageId>ZenIoc</PackageId>
-    <PackageTags>ZenIoc</PackageTags> <!-- separate with ; -->
+    <PackageTags>ZenIoc;ioc;dependency-injection;ioc-container;ioc-framework</PackageTags> <!-- separate with ; -->
     <PackageReleaseNotes>https://github.com/zenmvvm/ZenIoc/releases</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/zenmvvm/ZenIoc</PackageProjectUrl>
     <!-- Choose either PackageLicenseExpression or PackageLicenseFile (but not both) -->
