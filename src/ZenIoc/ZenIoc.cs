@@ -28,6 +28,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using FastExpressionCompiler;
 
 namespace ZenIoc
 {
@@ -1680,7 +1681,7 @@ namespace ZenIoc
                 resolveMethod,
                 Expression.Constant(key.Item2, typeof(string)));
 
-            ActivationExpression = instanceDelegate.Compile();
+            ActivationExpression = instanceDelegate.CompileFast();
         }
 
         /// <summary>
@@ -1720,7 +1721,7 @@ namespace ZenIoc
                 ActivationExpression = Expression.Lambda(
                     newExpression,
                     IIocContainerParameter
-                    ).Compile() as Func<IIocContainer, object>;
+                    ).CompileFast() as Func<IIocContainer, object>;
             }
         }
 

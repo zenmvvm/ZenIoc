@@ -50,4 +50,7 @@
     <Folder Include="package-items\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="FastExpressionCompiler" Version="2.0.0" />
+  </ItemGroup>
 </Project>
